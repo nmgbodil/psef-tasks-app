@@ -1,4 +1,3 @@
-console.log('App.tsx is loaded!');
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
