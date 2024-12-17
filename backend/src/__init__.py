@@ -3,12 +3,12 @@ from flask_cors import CORS, cross_origin
 import os
 import atexit
 from flask_jwt_extended import JWTManager
-from flask_swagger_ui import get_swaggerui_blueprint
+# from flask_swagger_ui import get_swaggerui_blueprint
 import datetime
-from flask_mail import Mail
+# from flask_mail import Mail
 from dotenv import load_dotenv
 
-from src.views.auth_view import auth
+# from src.views.auth_view import auth
 from src.utils.db import sync_connect_db_example, sync_db_util
 from src.constants.http_status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -52,7 +52,7 @@ def create_app(test_config=None):
     # )
 
     # App Blueprints
-    app.register_blueprint(auth)
+    # app.register_blueprint(auth)
     # app.register_blueprint(swaggerui_blueprint)
 
     @atexit.register
