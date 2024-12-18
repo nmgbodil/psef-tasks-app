@@ -1,25 +1,27 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-export default function App() {
+
+// Screens
+import SplashScreen from "./src/screens/SplashScreen";
+import SignInScreen from "./src/screens/SignInScreen";
+
+const Stack = createNativeStackNavigator();
+
+const App = () => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to PSEF!</Text>
-      <Text>This is your updated app!</Text>
-    </View>
+    <NavigationContainer>
+      {/* Stack Navigator to manage screens */}
+      <Stack.Navigator
+        initialRouteName="Splash" // Start with the splash screen
+        screenOptions={{ headerShown: false }} // Hide default headers for all screens
+      >
+        <Stack.Screen name="Splash" component={SplashScreen} />
+        <Stack.Screen name="SignIn" component={SignInScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#CFB87C',
-  },
-});
+export default App;
