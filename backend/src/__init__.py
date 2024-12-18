@@ -5,10 +5,10 @@ import atexit
 from flask_jwt_extended import JWTManager
 # from flask_swagger_ui import get_swaggerui_blueprint
 import datetime
-# from flask_mail import Mail
+from flask_mail import Mail
 from dotenv import load_dotenv
 
-# from src.views.auth_view import auth
+from src.views.auth_view import auth
 from src.utils.db import sync_connect_db_example, sync_db_util
 from src.constants.http_status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -32,14 +32,14 @@ def create_app(test_config=None):
     # Configure JWT manager
     jwt = JWTManager(app)
     
-    # # Configure gmail client for sending emails
-    # app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-    # app.config['MAIL_PORT'] = 587
-    # app.config['MAIL_USERNAME'] = os.environ.get("WAHALA_COMMS_EMAIL")
-    # app.config['MAIL_PASSWORD'] = os.environ.get("WAHALA_COMMS_EMAIL_PASSWORD")
-    # app.config['MAIL_USE_TLS'] = True
-    # app.config['MAIL_USE_SSL'] = False
-    # mail = Mail(app)
+    # Configure gmail client for sending emails
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USERNAME'] = os.environ.get("PSEF_TASKS_EMAIL")
+    app.config['MAIL_PASSWORD'] = os.environ.get("PSEF_TASKS_EMAIL_PASSWORD")
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USE_SSL'] = False
+    mail = Mail(app)
 
     # # Configure Swagger UI for api documentation
     # SWAGGER_URL = '/api/v1/docs'
@@ -52,7 +52,7 @@ def create_app(test_config=None):
     # )
 
     # App Blueprints
-    # app.register_blueprint(auth)
+    app.register_blueprint(auth)
     # app.register_blueprint(swaggerui_blueprint)
 
     @atexit.register
@@ -61,7 +61,7 @@ def create_app(test_config=None):
 
     @app.get("/")
     def hello():
-        return "Hello World, welcome to Wahala App backend!"
+        return "Hello World, welcome to PSEF TASKS TRACKER backend!"
     
     @app.get("/testdb/<string:connectionType>")
     def testDB(connectionType):
