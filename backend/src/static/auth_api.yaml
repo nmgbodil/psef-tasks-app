@@ -1,0 +1,154 @@
+openapi: 3.0.0
+info:
+  title: Authentication API
+  description: API documentation for user authentication endpoints.
+  version: 1.0.0
+paths:
+  /api/v1/auth/register:
+    post:
+      summary: Register a new user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: username@purdue.edu
+                password:
+                  type: string
+                  example: SuperSecurePassword123
+                first_name:
+                  type: string
+                  example: John
+                last_name:
+                  type: string
+                  example: Doe
+      responses:
+        201:
+          description: User successfully registered.
+        400:
+          description: Missing required fields or invalid input.
+        409:
+          description: User already exists.
+        500:
+          description: Internal servor error or email verification failed.
+    
+  /api/v1/auth/login:
+    post:
+      summary: Log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: username@purdue.edu
+                password:
+                  type: string
+                  example: SuperSecurePassword123
+      responses:
+        200:
+          description: User logged in successfully.
+          content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                access_token:
+                  type: string
+                  example: jwt_token_here
+        400:
+          description: Missing required fields.
+        401:
+          description: Invalid credentials or unverified account.
+        500:
+          description: Internal server error.
+  
+  /api/v1/auth/logout:
+    post:
+      summary: Log out a user.
+      reponses:
+        200:
+          description: Token destroyed on the frontend.
+  
+  /api/v1/auth/verify_user/{verification_token}/{verification_type}:
+    get:
+      summary: Verify a user account.
+      parameters:
+        - name: verification token
+          in: path
+          required: true
+          description: Verification token sent to the user.
+          schema:
+            type: string
+            example: verification_token_here
+        - name: verification_type
+          in: path
+          required: true
+          description: Verification request accepted or denied
+          schema:
+            type: boolean
+            example: true
+      repsonses:
+        204:
+          description: User successfully verified.
+        500:
+          description: Internal server error.
+  
+  /api/v1/auth/forgot_password:
+    post:
+      summary: Initiate password reset process.
+      requestBody:
+        required: true
+        content:
+          application/json:
+          schema:
+            type: object
+            properties:
+              email:
+                type: string
+                example: username@purdue.edu
+      responses:
+        200:
+          description: Password reset email successfully.
+        401:
+          description: Account does not exist or is unverified.
+        500:
+          description: Internal server error.
+
+  /api/v1/auth/reset_password/{reset_token}:
+    post:
+      summary: Reset the user password.
+      parameters:
+        - name: reset_token
+          in: path
+          required: true
+          description: Reset token sent to the user.
+          schema:
+            type: string
+            example: reset_token_here
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: NewSecurePassword123
+      responses:
+        200:
+          description: Password reset successfully.
+        400:
+          description: Invalid or expired reset link.
+        409:
+          description: Password is the same as the last one.
+        500:
+          description: Internal server error.

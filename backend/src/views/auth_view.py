@@ -85,7 +85,7 @@ def login():
 def logout():
     return jsonify({"message": "Successfully logged out, destroy the access_token"}), HTTP_200_OK
 
-# enforce frontend logic to call the method as post
+# enforce frontend logic to call the method as post and change auth_api.yaml
 @auth.get("/verify_user/<string:verification_token>/<string:verification_type>")
 def verify_user(verification_token, verification_type):
     try:

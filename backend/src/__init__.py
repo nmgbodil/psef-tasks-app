@@ -1,11 +1,11 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS, cross_origin
+from flask_jwt_extended import JWTManager
+from flask_swagger_ui import get_swaggerui_blueprint
+from flask_mail import Mail
 import os
 import atexit
-from flask_jwt_extended import JWTManager
-# from flask_swagger_ui import get_swaggerui_blueprint
 import datetime
-from flask_mail import Mail
 from dotenv import load_dotenv
 
 from src.views.auth_view import auth
@@ -41,18 +41,32 @@ def create_app(test_config=None):
     app.config['MAIL_USE_SSL'] = False
     mail = Mail(app)
 
-    # # Configure Swagger UI for api documentation
-    # SWAGGER_URL = '/api/v1/docs'
-    # API_URL = '/static/openapi.yaml'
+    # App Blueprints
+    app.register_blueprint(auth)
 
+    # Configure Swagger UI for api documentation
+    SWAGGER_URL = '/api/v1/docs'
+    API_FILES = [
+        {'name': 'auth', 'url': '/static/auth_api.yaml', 'prefix': f'{SWAGGER_URL}/auth'}
+    ]
+
+    for api_file in API_FILES:
+        swagger_blueprint = get_swaggerui_blueprint(
+            api_file['prefix'], api_file['url'],
+            config={'app_name': f"PSEF Task Tracker {api_file['name'].capitalize()} API"}
+        )
+        app.register_blueprint(swagger_blueprint, url_prefix=api_file['prefix'])
+
+    @app.route('/static/<path:filename>')
+    def serve_static(filename):
+        return send_from_directory('src/static', filename)
+    
     # # Call factory function to create our blueprint
     # swaggerui_blueprint = get_swaggerui_blueprint(
     #     SWAGGER_URL,
     #     API_URL
     # )
 
-    # App Blueprints
-    app.register_blueprint(auth)
     # app.register_blueprint(swaggerui_blueprint)
 
     @atexit.register
