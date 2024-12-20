@@ -1,41 +1,35 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { saveToken } from "../utils/auth_storage";
-import { login } from "../services/auth_api_services";
+import { forgot_password } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/types";
 
-const SignInScreen: React.FC = () => {
+const ForgotPasswordScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
 
-    const handleSignIn = async () => {
-        if (!email || !password) {
-            Alert.alert("Error", "Please enter both email and password.");
+    const handleForgotPassword = async () => {
+        if(!email) {
+            Alert.alert("Error", "Please enter an email.");
             return;
         }
 
         try {
-            const data = await login(email, password);
-            
-            if (data.message === "Welcome to your profile") {
-                const access_token = data.access_token;
-                await saveToken(access_token);
-                navigation.replace("Home");
+            const data = await forgot_password(email);
+
+            if (data.message === "Password reset email sent") {
+                Alert.alert("", "Password reset email sent")
+                return;
             }
         }
         catch (error: any) {
             if (error.error) {
                 switch (error.error) {
                     case "This account owner does not exist":
-                        Alert.alert("Error", "The account does not exist. Please register first.");
-                        break;
-                    case "Incorrect password":
-                        Alert.alert("Error", "The password you entered is incorrect. Try again.");
+                        Alert.alert("Error", "The account with this email address does not exist.");
                         break;
                     case "This account has not been verified":
-                        Alert.alert("Error", "Your account has not been verified. Check your email.");
+                        Alert.alert("Error", "This account has not been verified. Verify it through the link sent to your email.");
                         break;
                     default:
                         Alert.alert("Error", error.error);
@@ -50,7 +44,7 @@ const SignInScreen: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Sign In</Text>
+            <Text style={styles.title}>Let's make sure it's you</Text>
             <TextInput
                 placeholder="Email"
                 placeholderTextColor="#A0A0A0"
@@ -60,26 +54,12 @@ const SignInScreen: React.FC = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
-            <TextInput
-                placeholder="Password"
-                placeholderTextColor="#A0A0A0"
-                value={password}
-                onChangeText={setPassword}
-                style={styles.input}
-                secureTextEntry
-            />
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-                <Text style={styles.buttonText}>Sign In</Text>
+            <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
+                <Text style={styles.buttonText}>Send Password Reset Email</Text>
             </TouchableOpacity>
-            <View style={styles.forgot_row}>
-                <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
-                    <Text style={styles.link}>Forgot password?</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.account_row}>
-                <Text style={styles.text}>Don't have an account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                    <Text style={styles.link}> Create an account</Text>
+            <View style={styles.login_row}>
+                <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+                    <Text style={styles.link}>Log in</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -124,17 +104,9 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#FFFFFF",
     },
-    forgot_row: {
+    login_row: {
         flexDirection: "row",
         marginTop: 12,
-    },
-    account_row: {
-        flexDirection: "row",
-        marginTop: 12,
-    },
-    text: {
-        fontSize: 14,
-        color: "#000000",
     },
     link: {
         fontSize: 14,
@@ -143,4 +115,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SignInScreen;
+export default ForgotPasswordScreen;

@@ -1,38 +1,42 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { saveToken } from "../utils/auth_storage";
-import { login } from "../services/auth_api_services";
+import { useRoute, RouteProp, useNavigation, NavigationProp } from "@react-navigation/native";
+import { reset_password } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/types";
 
-const SignInScreen: React.FC = () => {
+const ResetPasswordScreen: React.FC = () => {
+    const route = useRoute<RouteProp<RootStackParamList, "ResetPassword">>();
+    const { resetToken } = route.params;
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-    const [email, setEmail] = useState<string>("");
-    const [password, setPassword] = useState<string>("");
+    const [new_password, setNewPassword] = useState<string>("");
+    const [confirm_password, setConfirmPassword] = useState<string>("");
 
-    const handleSignIn = async () => {
-        if (!email || !password) {
-            Alert.alert("Error", "Please enter both email and password.");
+    const handleResetPassword = async () => {
+        if (!new_password || !confirm_password) {
+            Alert.alert("Error", "Please enter all required information.");
+            return;
+        }
+
+        if (new_password !== confirm_password) {
+            Alert.alert("Error", "Passwords must match");
             return;
         }
 
         try {
-            const data = await login(email, password);
+            const data = await reset_password(resetToken, new_password);
             
-            if (data.message === "Welcome to your profile") {
-                const access_token = data.access_token;
-                await saveToken(access_token);
-                navigation.replace("Home");
+            if (data.message === "Your password has successfully been reset") {
+                navigation.replace("SignIn");
             }
         }
         catch (error: any) {
             if (error.error) {
                 switch (error.error) {
-                    case "This account owner does not exist":
-                        Alert.alert("Error", "The account does not exist. Please register first.");
+                    case "Password cannot be the same as your last password":
+                        Alert.alert("Error", "Password cannot be the same as your last password");
                         break;
-                    case "Incorrect password":
-                        Alert.alert("Error", "The password you entered is incorrect. Try again.");
+                    case "This link is either invalid or has expired":
+                        Alert.alert("Error", "This link is either invalid or has expired.");
                         break;
                     case "This account has not been verified":
                         Alert.alert("Error", "Your account has not been verified. Check your email.");
@@ -52,34 +56,27 @@ const SignInScreen: React.FC = () => {
         <View style={styles.container}>
             <Text style={styles.title}>Sign In</Text>
             <TextInput
-                placeholder="Email"
-                placeholderTextColor="#A0A0A0"
-                value={email}
-                onChangeText={setEmail}
-                style={styles.input}
-                keyboardType="email-address"
-                autoCapitalize="none"
-            />
-            <TextInput
                 placeholder="Password"
                 placeholderTextColor="#A0A0A0"
-                value={password}
-                onChangeText={setPassword}
+                value={new_password}
+                onChangeText={setNewPassword}
                 style={styles.input}
                 secureTextEntry
             />
-            <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-                <Text style={styles.buttonText}>Sign In</Text>
+            <TextInput
+                placeholder="Confirm Password"
+                placeholderTextColor="#A0A0A0"
+                value={confirm_password}
+                onChangeText={setConfirmPassword}
+                style={styles.input}
+                secureTextEntry
+            />
+            <TouchableOpacity style={styles.button} onPress={handleResetPassword}>
+                <Text style={styles.buttonText}>Reset Password</Text>
             </TouchableOpacity>
-            <View style={styles.forgot_row}>
-                <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
-                    <Text style={styles.link}>Forgot password?</Text>
-                </TouchableOpacity>
-            </View>
-            <View style={styles.account_row}>
-                <Text style={styles.text}>Don't have an account?</Text>
-                <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
-                    <Text style={styles.link}> Create an account</Text>
+            <View style={styles.login_row}>
+                <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+                    <Text style={styles.link}>Log in</Text>
                 </TouchableOpacity>
             </View>
         </View>
@@ -124,17 +121,9 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#FFFFFF",
     },
-    forgot_row: {
+    login_row: {
         flexDirection: "row",
         marginTop: 12,
-    },
-    account_row: {
-        flexDirection: "row",
-        marginTop: 12,
-    },
-    text: {
-        fontSize: 14,
-        color: "#000000",
     },
     link: {
         fontSize: 14,
@@ -143,4 +132,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default SignInScreen;
+export default ResetPasswordScreen;
