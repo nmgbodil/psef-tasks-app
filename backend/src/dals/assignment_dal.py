@@ -22,6 +22,32 @@ def get_task_assignment_count(task_id):
 
     return record[0]
 
+def get_all_assignments():
+    statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.description, a.user_id, a.assigned_by, t.start_time, t.end_time
+    FROM assignments a
+    INNER JOIN tasks t ON a.task_id = t.task_id
+    ORDER BY t.start_time ASC;
+    '''
+
+    assignments = sync_db_util.execute_query_fetchall(statement)
+    assignment_list = []
+
+    for assignment in assignments:
+        print(assignment)
+        assignment_obj = Assignment(
+            assignment_id=assignment[0],
+            task_id=assignment[1],
+            task_name=assignment[2],
+            description=assignment[3],
+            user_id=assignment[4],
+            assigned_by=assignment[5],
+            start_time=assignment[6],
+            end_time=assignment[7]
+        )
+        assignment_list.append(assignment_obj.dict())
+    
+    return assignment_list
+
 def check_assignment_exists(task_id, user_id):
     statement = f'''SELECT EXISTS(SELECT 1 FROM assignments WHERE task_id = '{task_id}' and user_id = '{user_id}');'''
 

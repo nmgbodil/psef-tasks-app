@@ -100,7 +100,7 @@ def update_task(user_id: str, updates: dict, task_id: str):
 
 def update_assignment(user_id: str, assignee_id: str, assignment_id: str):
     try:
-        # Access control (Only coordinators can drop others tasks)
+        # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
             return 'user unauthorized'
 
@@ -117,4 +117,38 @@ def update_assignment(user_id: str, assignee_id: str, assignment_id: str):
     
     except Exception as e:
         print(f'Error updating assignment: {str(e)}')
+        return 'error'
+
+def get_all_tasks(user_id: str):
+    results = {'message': None, 'task_list': None}
+
+    try:
+        # Access control for coordinators only
+        if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
+            results['message'] = 'user_unauthorized'
+            return results
+        
+        results['task_list'] = task_dal.get_all_tasks()
+        results['message'] = 'tasks successfully retrieved'
+        return results
+    
+    except Exception as e:
+        print(f'Error retrieving all tasks: {str(e)}')
+        return 'error'
+
+def get_all_assignments(user_id):
+    results = {'message': None, 'assignment_list': None}
+
+    try:
+        # Access control (Only coordinators can drop others tasks)
+        if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
+            results['message'] = 'user_unauthorized'
+            return results
+        
+        results['assignment_list'] = assignment_dal.get_all_assignments()
+        results['message'] = 'assignments successfully retrieved'
+        return results
+    
+    except Exception as e:
+        print(f'Error retrieving all assignments: {str(e)}')
         return 'error'

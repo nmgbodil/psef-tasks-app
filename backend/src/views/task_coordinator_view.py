@@ -185,3 +185,47 @@ def update_assignment(assignment_id):
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.get("/all_tasks")
+@jwt_required()
+def get_all_tasks():
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_coordinator_manager.get_all_tasks(user_id)
+        message = result.get('message')
+
+        if message == 'tasks successfully retrieved':
+            task_list = result.get('task_list')
+            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': task_list}), HTTP_200_OK
+        elif message == 'user unauthorized':
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+    
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.get("/all_assignments")
+@jwt_required()
+def get_all_assignments():
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_coordinator_manager.get_all_assignments(user_id)
+        message = result.get('message')
+
+        if message == 'assignments successfully retrieved':
+            assignment_list = result.get('assignment_list')
+            return jsonify({'message': 'Assignments', 'assignments': assignment_list}), HTTP_200_OK
+        elif message == 'user unauthorized':
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+    
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR

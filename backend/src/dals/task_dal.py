@@ -19,6 +19,27 @@ def get_task_by_id(task_id):
 
     return task
 
+def get_all_tasks():
+    statement = f'''SELECT * FROM tasks ORDER BY start_time ASC;'''
+
+    tasks = sync_db_util.execute_query_fetchall(statement)
+    task_list = []
+
+    for task in tasks:
+        task_obj = Task(
+            task_id=task[0],
+            task_name=task[1],
+            task_type=task[2],
+            description=task[3],
+            start_time=task[4],
+            end_time=task[5],
+            max_participants=task[6],
+            status=task[7],
+        )
+        task_list.append(task_obj.dict())
+
+    return task_list
+
 def check_task_exists(task: Task):
     statement = f'''SELECT EXISTS(
     SELECT 1 FROM tasks WHERE task_name = '{task.task_name}'
