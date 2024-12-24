@@ -2,11 +2,11 @@ openapi: 3.0.0
 info:
   title: Authentication API
   description: API documentation for user authentication endpoints.
-  version: 1.0.0
+  version: 1.0.1
 paths:
   /api/v1/auth/register:
     post:
-      summary: Register a new user.
+      summary: Register a new user
       requestBody:
         required: true
         content:
@@ -16,9 +16,11 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                   example: username@purdue.edu
                 password:
                   type: string
+                  minLength: 8
                   example: SuperSecurePassword123
                 first_name:
                   type: string
@@ -28,13 +30,13 @@ paths:
                   example: Doe
       responses:
         201:
-          description: User successfully registered.
+          description: User successfully registered
         400:
-          description: Missing required fields or invalid input.
+          description: Missing required fields or invalid input
         409:
-          description: User already exists.
+          description: User already exists
         500:
-          description: Internal servor error or email verification failed.
+          description: Internal server error or email verification failed
     
   /api/v1/auth/login:
     post:
@@ -48,43 +50,44 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                   example: username@purdue.edu
                 password:
                   type: string
                   example: SuperSecurePassword123
       responses:
         200:
-          description: User logged in successfully.
+          description: User logged in successfully
           content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                access_token:
-                  type: string
-                  example: jwt_token_here
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                    example: jwt_token_here
         400:
-          description: Missing required fields.
+          description: Missing required fields
         401:
-          description: Invalid credentials or unverified account.
+          description: Invalid credentials or unverified account
         500:
-          description: Internal server error.
+          description: Internal server error
   
   /api/v1/auth/logout:
     post:
-      summary: Log out a user.
-      reponses:
+      summary: Log out a user
+      responses:
         200:
-          description: Token destroyed on the frontend.
+          description: Token destroyed on the frontend
   
   /api/v1/auth/verify_user/{verification_token}/{verification_type}:
     get:
-      summary: Verify a user account.
+      summary: Verify a user account
       parameters:
-        - name: verification token
+        - name: verification_token
           in: path
           required: true
-          description: Verification token sent to the user.
+          description: Verification token sent to the user
           schema:
             type: string
             example: verification_token_here
@@ -95,41 +98,44 @@ paths:
           schema:
             type: boolean
             example: true
-      repsonses:
+      responses:
         204:
-          description: User successfully verified.
+          description: User successfully verified
+        400:
+          description: Invalid or missing token
         500:
-          description: Internal server error.
+          description: Internal server error
   
   /api/v1/auth/forgot_password:
     post:
-      summary: Initiate password reset process.
+      summary: Initiate password reset process
       requestBody:
         required: true
         content:
           application/json:
-          schema:
-            type: object
-            properties:
-              email:
-                type: string
-                example: username@purdue.edu
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: username@purdue.edu
       responses:
         200:
-          description: Password reset email successfully.
+          description: Password reset email sent successfully
         401:
-          description: Account does not exist or is unverified.
+          description: Account does not exist or is unverified
         500:
-          description: Internal server error.
+          description: Internal server error
 
   /api/v1/auth/reset_password/{reset_token}:
     post:
-      summary: Reset the user password.
+      summary: Reset the user password
       parameters:
         - name: reset_token
           in: path
           required: true
-          description: Reset token sent to the user.
+          description: Reset token sent to the user
           schema:
             type: string
             example: reset_token_here
@@ -145,10 +151,10 @@ paths:
                   example: NewSecurePassword123
       responses:
         200:
-          description: Password reset successfully.
+          description: Password reset successfully
         400:
-          description: Invalid or expired reset link.
+          description: Invalid or expired reset link
         409:
-          description: Password is the same as the last one.
+          description: Password is the same as the last one
         500:
-          description: Internal server error.
+          description: Internal server error

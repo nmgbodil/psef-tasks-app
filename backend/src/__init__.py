@@ -50,7 +50,7 @@ def create_app(test_config=None):
     SWAGGER_URL = '/api/v1/docs'
     API_FILES = [
         {'name': 'auth', 'url': '/static/auth_api.yaml', 'prefix': f'{SWAGGER_URL}/auth'},
-        {'name': 'task', 'url': '/static/task_api.yaml', 'prefix': f'{SWAGGER_URL}/task'}
+        {'name': 'task', 'url': '/static/task_coordinator_api.yaml', 'prefix': f'{SWAGGER_URL}/task_coordinator'}
     ]
 
     for api_file in API_FILES:

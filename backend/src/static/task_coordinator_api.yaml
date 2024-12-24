@@ -1,0 +1,182 @@
+openapi: 3.0.0
+info:
+  title: Task Coordinator API
+  description: API documentation for task coordinator endpoints.
+  version: 1.0.0
+paths:
+  /api/v1/tasks/coordinator/create:
+    post:
+      summary: Create a new task
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                task_name:
+                  type: string
+                  example: "Prepare Presentation"
+                task_type:
+                  type: string
+                  example: "Individual"
+                description:
+                  type: string
+                  example: "Prepare a slide deck for the team meeting"
+                start_time:
+                  type: string
+                  format: date-time
+                  example: "2024-12-23T09:00:00Z"
+                end_time:
+                  type: string
+                  format: date-time
+                  example: "2024-12-23T12:00:00Z"
+                max_participants:
+                  type: integer
+                  example: 5
+      responses:
+        201:
+          description: Task successfully created
+        400:
+          description: Missing required fields or invalid input
+        409:
+          description: Task already exists
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/assign:
+    post:
+      summary: Assign a task to a user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assignee_id:
+                  type: string
+                  example: "user123"
+                task_id:
+                  type: string
+                  example: "3"
+      responses:
+        201:
+          description: Task successfully assigned
+        400:
+          description: Missing required fields
+        409:
+          description: Assignment already exists or assignee not available
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/delete_task/{task_id}:
+    delete:
+      summary: Delete a task
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3"
+      responses:
+        200:
+          description: Task successfully deleted
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/delete_assignment/{assignment_id}:
+    delete:
+      summary: Delete a task assignment
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assignment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3"
+      responses:
+        200:
+          description: Assignment successfully deleted
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/update_task/{task_id}:
+    patch:
+      summary: Update task details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: task_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: true
+      responses:
+        200:
+          description: Task successfully updated
+        400:
+          description: Invalid or misplaced fields
+        401:
+          description: Unauthorized access
+        500:
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/update_assignment/{assignment_id}:
+    patch:
+      summary: Update task assignment details
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: assignment_id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                assignee_id:
+                  type: string
+                  example: "user456"
+      responses:
+        200:
+          description: Assignment successfully updated
+        400:
+          description: Missing required fields
+        401:
+          description: Unauthorized access
+        409:
+          description: Assignment conflict
+        500:
+          description: Internal server error
