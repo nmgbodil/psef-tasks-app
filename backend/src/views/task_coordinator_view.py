@@ -4,12 +4,12 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from src.models.task_model import Task
 from src.models.user_model import User
-from src.managers import task_manager
+from src.managers import task_coordinator_manager
 from src.constants.http_status_codes import *
 
-task = Blueprint("task", __name__, url_prefix="/api/v1/tasks")
+task_coordinator = Blueprint("task", __name__, url_prefix="/api/v1/tasks/coordinator")
 
-@task.post("/coordinator/create")
+@task_coordinator.post("/create")
 @jwt_required()
 def create_task():
     user_id = get_jwt_identity()
@@ -34,7 +34,7 @@ def create_task():
             task.max_participants = data.get('max_participants')
 
         # Attempt to create the task
-        result = task_manager.create_task(user_id, task)
+        result = task_coordinator_manager.create_task(user_id, task)
 
         if result == 'task successfully created':
             return jsonify({'message': 'Task successfully created'}), HTTP_201_CREATED
@@ -52,7 +52,7 @@ def create_task():
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
 
-@task.post("/coordinator/assign")
+@task_coordinator.post("/assign")
 @jwt_required()
 def assign_task():
     user_id = get_jwt_identity()
@@ -67,7 +67,7 @@ def assign_task():
         task_id = data.get('task_id')
         assignee_id = data.get('assignee_id')
 
-        result = task_manager.assign_task(user_id, assignee_id, task_id)
+        result = task_coordinator_manager.assign_task(user_id, assignee_id, task_id)
 
         if result == 'assignment successfully created':
             return jsonify({'message': 'Assignment has been successfully created'}), HTTP_201_CREATED
@@ -87,13 +87,13 @@ def assign_task():
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
-@task.delete("/coordinator/delete_task/<string:task_id>")
+@task_coordinator.delete("delete_task/<string:task_id>")
 @jwt_required()
 def delete_task(task_id):
     user_id = get_jwt_identity()
 
     try:
-        result = task_manager.delete_task(user_id, task_id)
+        result = task_coordinator_manager.delete_task(user_id, task_id)
 
         if result == 'task successfully deleted':
             return jsonify({'message': 'Task successfully deleted'}), HTTP_200_OK
@@ -107,13 +107,13 @@ def delete_task(task_id):
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
-@task.delete("/coordinator/delete_assignment/<string:assignment_id>")
+@task_coordinator.delete("/delete_assignment/<string:assignment_id>")
 @jwt_required()
 def delete_assignment(assignment_id):
     user_id = get_jwt_identity()
 
     try:
-        result = task_manager.delete_assignment(user_id, assignment_id)
+        result = task_coordinator_manager.delete_assignment(user_id, assignment_id)
 
         if result == 'assignment successfully deleted':
             return jsonify({'message': 'Assignment successfully deleted'}), HTTP_200_OK
@@ -127,7 +127,7 @@ def delete_assignment(assignment_id):
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
-@task.patch("/coordinator/update_task/<string:task_id>")
+@task_coordinator.patch("/update_task/<string:task_id>")
 @jwt_required()
 def update_task(task_id):
     user_id = get_jwt_identity()
@@ -141,7 +141,7 @@ def update_task(task_id):
         if misplaced_fields:
             return jsonify({"error": f"Following fields are not valid: {', '.join(misplaced_fields)}"}), HTTP_400_BAD_REQUEST
         
-        result = task_manager.update_task(user_id, data, task_id)
+        result = task_coordinator_manager.update_task(user_id, data, task_id)
 
         if result == 'task successfully updated':
             return jsonify({'message': 'Task successfully updated'}), HTTP_200_OK
@@ -155,7 +155,7 @@ def update_task(task_id):
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
     
-@task.patch("coordinator/update_assignment/<string:assignment_id>")
+@task_coordinator.patch("/update_assignment/<string:assignment_id>")
 @jwt_required()
 def update_assignment(assignment_id):
     user_id = get_jwt_identity()
@@ -168,7 +168,7 @@ def update_assignment(assignment_id):
             return jsonify({"error": f"Missing fields: {', '.join(missing_fields)}"}), HTTP_400_BAD_REQUEST
         
         assignee_id = data.get('assignee_id')
-        result = task_manager.update_assignment(user_id, assignee_id, assignment_id)
+        result = task_coordinator_manager.update_assignment(user_id, assignee_id, assignment_id)
 
         if result == 'assignment successfully updated':
             return jsonify({'message': 'Assignment successfully updated'}), HTTP_200_OK

@@ -9,7 +9,7 @@ import datetime
 from dotenv import load_dotenv
 
 from src.views.auth_view import auth
-from src.views.task_view import task
+from src.views.task_coordinator_view import task_coordinator
 from src.utils.db import sync_connect_db_example, sync_db_util
 from src.constants.http_status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -44,7 +44,7 @@ def create_app(test_config=None):
 
     # App Blueprints
     app.register_blueprint(auth)
-    app.register_blueprint(task)
+    app.register_blueprint(task_coordinator)
 
     # Configure Swagger UI for api documentation
     SWAGGER_URL = '/api/v1/docs'
