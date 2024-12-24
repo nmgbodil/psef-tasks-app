@@ -282,7 +282,6 @@ def verify_user(verification_token, verification_type):
             """
 
             mail.send(msg)
-            print("mail sent")
 
 
         except Exception as e:

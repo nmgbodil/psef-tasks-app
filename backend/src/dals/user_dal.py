@@ -4,7 +4,7 @@ from src.models.user_model import User
 def get_user_by_id(user_id):
     statement = f'''SELECT * FROM users WHERE user_id = '{user_id}';'''
 
-    user_id, email, password_hash, created_at, updated_at, first_name, last_name, verified = sync_db_util.execute_query_fetchone(statement)
+    user_id, email, password_hash, created_at, updated_at, first_name, last_name, verified, role = sync_db_util.execute_query_fetchone(statement)
 
     user = User(
         user_id=user_id,
@@ -12,7 +12,8 @@ def get_user_by_id(user_id):
         password_hash=password_hash,
         first_name=first_name,
         last_name=last_name,
-        verified=verified
+        verified=verified,
+        role=role
     )
 
     # returns None if no record is found
@@ -22,7 +23,7 @@ def get_user_by_id(user_id):
 def get_user_by_email(email):
     statement = f'''SELECT * FROM users WHERE email = '{email}';'''
 
-    user_id, email, password_hash, created_at, updated_at, first_name, last_name, verified = sync_db_util.execute_query_fetchone(statement)
+    user_id, email, password_hash, created_at, updated_at, first_name, last_name, verified, role = sync_db_util.execute_query_fetchone(statement)
 
     user = User(
         user_id=user_id,
@@ -30,12 +31,19 @@ def get_user_by_email(email):
         password_hash=password_hash,
         first_name=first_name,
         last_name=last_name,
-        verified=verified
+        verified=verified,
+        role=role
     )
 
     # returns None if no record is found
     return user
 
+def get_user_role(user_id):
+    statement = f'''SELECT role FROM users WHERE user_id = '{user_id}';'''
+
+    record = sync_db_util.execute_query_fetchone(statement)
+
+    return record[0]
 
 def check_user_exists_by_email(email):
     statement = f'''SELECT EXISTS(SELECT 1 FROM users WHERE email = '{email}');'''

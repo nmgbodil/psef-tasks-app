@@ -1,5 +1,10 @@
 from typing import Optional
 from pydantic import BaseModel
+from enum import Enum
+
+class UserRole(str, Enum):
+    USER = 'User'
+    COORDINATOR = 'Coordinator'
 
 class User(BaseModel):
     user_id: Optional[str] = None
@@ -8,3 +13,4 @@ class User(BaseModel):
     first_name: Optional[str] = None
     last_name: Optional[str] = None
     verified: Optional[bool] = None
+    role: Optional[UserRole] = None

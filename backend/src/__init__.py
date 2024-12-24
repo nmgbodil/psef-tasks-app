@@ -9,6 +9,7 @@ import datetime
 from dotenv import load_dotenv
 
 from src.views.auth_view import auth
+from src.views.task_view import task
 from src.utils.db import sync_connect_db_example, sync_db_util
 from src.constants.http_status_codes import HTTP_404_NOT_FOUND, HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -43,11 +44,13 @@ def create_app(test_config=None):
 
     # App Blueprints
     app.register_blueprint(auth)
+    app.register_blueprint(task)
 
     # Configure Swagger UI for api documentation
     SWAGGER_URL = '/api/v1/docs'
     API_FILES = [
-        {'name': 'auth', 'url': '/static/auth_api.yaml', 'prefix': f'{SWAGGER_URL}/auth'}
+        {'name': 'auth', 'url': '/static/auth_api.yaml', 'prefix': f'{SWAGGER_URL}/auth'},
+        {'name': 'task', 'url': '/static/task_api.yaml', 'prefix': f'{SWAGGER_URL}/task'}
     ]
 
     for api_file in API_FILES:
@@ -55,19 +58,12 @@ def create_app(test_config=None):
             api_file['prefix'], api_file['url'],
             config={'app_name': f"PSEF Task Tracker {api_file['name'].capitalize()} API"}
         )
+        swagger_blueprint.name = f"swagger_ui_{api_file['name']}"
         app.register_blueprint(swagger_blueprint, url_prefix=api_file['prefix'])
 
     @app.route('/static/<path:filename>')
     def serve_static(filename):
         return send_from_directory('src/static', filename)
-    
-    # # Call factory function to create our blueprint
-    # swaggerui_blueprint = get_swaggerui_blueprint(
-    #     SWAGGER_URL,
-    #     API_URL
-    # )
-
-    # app.register_blueprint(swaggerui_blueprint)
 
     @atexit.register
     def app_shutdown_cleanup():

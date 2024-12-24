@@ -117,7 +117,7 @@ def forgot_password():
         elif message == 'DNE':
             return jsonify({'error': 'This account owner does not exist'}), HTTP_401_UNAUTHORIZED
         elif message == 'unverified':
-            return jsonify({'message': 'This account has not been verified. Verify it through the link sent to your email'}), HTTP_401_UNAUTHORIZED
+            return jsonify({'error': 'This account has not been verified'}), HTTP_401_UNAUTHORIZED
         else:
             return jsonify({'error': 'unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -137,9 +137,9 @@ def reset_password(reset_token):
         result = auth_manager.reset_password(password, reset_token)
 
         if result == 'success':
-            return jsonify({'message': 'Your password has successful been reset'}), HTTP_200_OK
+            return jsonify({'message': 'Your password has successfully been reset'}), HTTP_200_OK
         elif result == 'password is same as the last':
-            return jsonify({'message': 'Password cannot be the same as your last password'}), HTTP_409_CONFLICT
+            return jsonify({'error': 'Password cannot be the same as your last password'}), HTTP_409_CONFLICT
         elif result is None:
             return jsonify({'error': 'This link is either invalid or has expired'}), HTTP_400_BAD_REQUEST
         else:
