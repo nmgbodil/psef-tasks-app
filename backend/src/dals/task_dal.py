@@ -20,7 +20,10 @@ def get_task_by_id(task_id):
     return task
 
 def get_all_tasks():
-    statement = f'''SELECT * FROM tasks ORDER BY start_time ASC;'''
+    statement = f'''SELECT * FROM tasks
+    WHERE start_time >= CURRENT_TIMESTAMP
+    ORDER BY start_time ASC;
+    '''
 
     tasks = sync_db_util.execute_query_fetchall(statement)
     task_list = []

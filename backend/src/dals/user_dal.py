@@ -45,6 +45,31 @@ def get_user_role(user_id):
 
     return record[0]
 
+def get_all_users():
+    statement = f'''SELECT user_id, first_name, last_name, email, role FROM users WHERE verified = TRUE ORDER BY first_name ASC;'''
+
+    users = sync_db_util.execute_query_fetchall(statement)
+    user_list = []
+
+    for user in users:
+        user_obj = User(
+            user_id=user[0],
+            first_name=user[1],
+            last_name=user[2],
+            email=user[3],
+            role=user[4]
+        )
+        user_list.append(user_obj.dict())
+    
+    return user_list
+
+def check_user_exists_by_id(user_id):
+    statement = f'''SELECT EXISTS(SELECT 1 FROM users WHERE user_id = '{user_id}');'''
+
+    record = sync_db_util.execute_query_fetchone(statement)
+
+    return record[0]
+
 def check_user_exists_by_email(email):
     statement = f'''SELECT EXISTS(SELECT 1 FROM users WHERE email = '{email}');'''
 

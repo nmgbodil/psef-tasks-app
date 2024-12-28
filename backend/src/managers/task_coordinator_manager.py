@@ -137,18 +137,71 @@ def get_all_tasks(user_id: str):
         return 'error'
 
 def get_all_assignments(user_id):
-    results = {'message': None, 'assignment_list': None}
+    def handleUserData(assignment):
+        user = user_dal.get_user_by_id(assignment['user_id'])
+        user_data = {
+            'user_id': user.user_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name
+        }
+        return user_data
+
+    def handleAllAssignments(assignment_list):
+        assignment_by_task = {}
+        sorted_tasks = []
+
+        for assignment in assignment_list:
+            task_id = assignment['task_id']
+            user_data = handleUserData(assignment)
+    
+            if task_id not in assignment_by_task:
+                assignment_by_task[task_id] = {
+                    'assignment_id': assignment['assignment_id'],
+                    'task_name': assignment['task_name'],
+                    'description': assignment['description'],
+                    'users': [],
+                    'start_time': assignment['start_time'],
+                    'end_time': assignment['end_time']
+                }
+                sorted_tasks.append(task_id)
+    
+            assignment_by_task[task_id]['users'].append(user_data)
+        
+        return assignment_by_task, sorted_tasks
+
+
+    results = {'message': None, 'assignment_list': None, 'sorted_tasks': None}
 
     try:
-        # Access control (Only coordinators can drop others tasks)
+        # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
             results['message'] = 'user_unauthorized'
             return results
         
-        results['assignment_list'] = assignment_dal.get_all_assignments()
+        assignment_list = assignment_dal.get_all_assignments()
+        response = handleAllAssignments(assignment_list)
+        results['assignment_list'] = response[0]
+        results['sorted_tasks'] = response[1]
         results['message'] = 'assignments successfully retrieved'
         return results
     
     except Exception as e:
         print(f'Error retrieving all assignments: {str(e)}')
+        return 'error'
+
+def get_all_users(user_id):
+    results = {'message': None, 'user_list': None}
+
+    try:
+        # Access control for coordinators only
+        if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
+            results['message'] = 'user_unauthorized'
+            return results
+        
+        results['user_list'] = user_dal.get_all_users()
+        results['message'] = 'users successfully retrieved'
+        return results
+    
+    except Exception as e:
+        print(f'Error retrieving all users: {str(e)}')
         return 'error'

@@ -26,6 +26,7 @@ def get_all_assignments():
     statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.description, a.user_id, a.assigned_by, t.start_time, t.end_time
     FROM assignments a
     INNER JOIN tasks t ON a.task_id = t.task_id
+    Where t.start_time >= CURRENT_TIMESTAMP
     ORDER BY t.start_time ASC;
     '''
 

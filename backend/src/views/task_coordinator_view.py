@@ -7,7 +7,7 @@ from src.models.user_model import User
 from src.managers import task_coordinator_manager
 from src.constants.http_status_codes import *
 
-task_coordinator = Blueprint("task", __name__, url_prefix="/api/v1/tasks/coordinator")
+task_coordinator = Blueprint("task_coordinator", __name__, url_prefix="/api/v1/tasks/coordinator")
 
 @task_coordinator.post("/create")
 @jwt_required()
@@ -219,7 +219,30 @@ def get_all_assignments():
 
         if message == 'assignments successfully retrieved':
             assignment_list = result.get('assignment_list')
-            return jsonify({'message': 'Assignments', 'assignments': assignment_list}), HTTP_200_OK
+            sorted_tasks = result.get('sorted_tasks')
+            return jsonify({'message': 'Assignments successfully retrieved', 'assignments': assignment_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
+        elif message == 'user unauthorized':
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+    
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.get("/all_users")
+@jwt_required()
+def get_all_users():
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_coordinator_manager.get_all_users(user_id)
+        message = result.get('message')
+
+        if message == 'users successfully retrieved':
+            user_list = result.get('user_list')
+            return jsonify({'message': 'Users successfully retrieved', 'users': user_list}), HTTP_200_OK
         elif message == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
         else:

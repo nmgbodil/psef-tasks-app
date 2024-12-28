@@ -21,31 +21,31 @@ paths:
                   example: "Prepare Presentation"
                 task_type:
                   type: string
-                  example: "Individual"
+                  example: "Meeting"
                 description:
                   type: string
-                  example: "Prepare a slide deck for the team meeting"
+                  example: "Discuss project milestones."
                 start_time:
                   type: string
                   format: date-time
-                  example: "2024-12-23T09:00:00Z"
+                  example: "2024-01-10T09:00:00Z"
                 end_time:
                   type: string
                   format: date-time
-                  example: "2024-12-23T12:00:00Z"
+                  example: "2024-01-10T10:00:00Z"
                 max_participants:
                   type: integer
-                  example: 5
+                  example: 10
       responses:
-        201:
+        "201":
           description: Task successfully created
-        400:
-          description: Missing required fields or invalid input
-        409:
+        "400":
+          description: Missing required fields or invalid data
+        "409":
           description: Task already exists
-        401:
-          description: Unauthorized access
-        500:
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
 
   /api/v1/tasks/coordinator/assign:
@@ -65,17 +65,17 @@ paths:
                   example: "user123"
                 task_id:
                   type: string
-                  example: "3"
+                  example: "task456"
       responses:
-        201:
-          description: Task successfully assigned
-        400:
-          description: Missing required fields
-        409:
-          description: Assignment already exists or assignee not available
-        401:
-          description: Unauthorized access
-        500:
+        "201":
+          description: Assignment successfully created
+        "409":
+          description: Assignment already exists or assignee not free
+        "400":
+          description: Maximum participants reached
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
 
   /api/v1/tasks/coordinator/delete_task/{task_id}:
@@ -89,18 +89,17 @@ paths:
           required: true
           schema:
             type: string
-            example: "3"
       responses:
-        200:
+        "200":
           description: Task successfully deleted
-        401:
-          description: Unauthorized access
-        500:
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
 
   /api/v1/tasks/coordinator/delete_assignment/{assignment_id}:
     delete:
-      summary: Delete a task assignment
+      summary: Delete an assignment
       security:
         - bearerAuth: []
       parameters:
@@ -109,18 +108,17 @@ paths:
           required: true
           schema:
             type: string
-            example: "3"
       responses:
-        200:
+        "200":
           description: Assignment successfully deleted
-        401:
-          description: Unauthorized access
-        500:
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
 
   /api/v1/tasks/coordinator/update_task/{task_id}:
     patch:
-      summary: Update task details
+      summary: Update a task
       security:
         - bearerAuth: []
       parameters:
@@ -129,27 +127,44 @@ paths:
           required: true
           schema:
             type: string
-            example: "3"
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              additionalProperties: true
+              properties:
+                task_name:
+                  type: string
+                  example: "Updated Task Name"
+                task_type:
+                  type: string
+                  example: "Updated Type"
+                description:
+                  type: string
+                  example: "Updated description."
+                start_time:
+                  type: string
+                  format: date-time
+                  example: "2024-01-11T09:00:00Z"
+                end_time:
+                  type: string
+                  format: date-time
+                  example: "2024-01-11T10:00:00Z"
+                max_participants:
+                  type: integer
+                  example: 20
       responses:
-        200:
+        "200":
           description: Task successfully updated
-        400:
-          description: Invalid or misplaced fields
-        401:
-          description: Unauthorized access
-        500:
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
 
   /api/v1/tasks/coordinator/update_assignment/{assignment_id}:
     patch:
-      summary: Update task assignment details
+      summary: Update an assignment
       security:
         - bearerAuth: []
       parameters:
@@ -158,7 +173,6 @@ paths:
           required: true
           schema:
             type: string
-            example: "3"
       requestBody:
         required: true
         content:
@@ -168,15 +182,140 @@ paths:
               properties:
                 assignee_id:
                   type: string
-                  example: "user456"
+                  example: "new_user123"
       responses:
-        200:
+        "200":
           description: Assignment successfully updated
-        400:
-          description: Missing required fields
-        401:
-          description: Unauthorized access
-        409:
-          description: Assignment conflict
-        500:
+        "409":
+          description: Assignment already exists or assignee not free
+        "401":
+          description: Unauthorized
+        "500":
           description: Internal server error
+
+  /api/v1/tasks/coordinator/all_tasks:
+    get:
+      summary: Retrieve all tasks
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Tasks successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tasks:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        task_id:
+                          type: string
+                          example: "task456"
+                        task_name:
+                          type: string
+                          example: "Sample Task"
+                        task_type:
+                          type: string
+                          example: "Meeting"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/all_assignments:
+    get:
+      summary: Retrieve all assignments
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Assignments successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  assignments:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        assignment_id:
+                          type: integer
+                          example: 1
+                        task_name:
+                          type: string
+                          example: "EIS Tour"
+                        description:
+                          type: string
+                          example: "Tour guide"
+                        start_time:
+                          type: string
+                          format: date-time
+                          example: "2025-01-20T11:30:00Z"
+                        end_time:
+                          type: string
+                          format: date-time
+                          example: "2025-01-20T12:30:00Z"
+                        users:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              first_name:
+                                type: string
+                                example: "Chizzie"
+                              last_name:
+                                type: string
+                                example: "Mgbodille"
+                              user_id:
+                                type: string
+                                example: "b058b8d5-a9b4-4f43-9ffd-7aedb454dbe4"
+                  sorted_tasks:
+                    type: array
+                    items:
+                      type: integer
+                      example: 1
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+  /api/v1/tasks/coordinator/all_users:
+    get:
+      summary: Retrieve all users
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Users successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        user_id:
+                          type: string
+                          example: "user123"
+                        username:
+                          type: string
+                          example: "johndoe"
+        "401":
+          description: Unauthorized
+        "500":
+          description: Internal server error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
