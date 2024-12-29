@@ -34,7 +34,6 @@ def get_all_assignments():
     assignment_list = []
 
     for assignment in assignments:
-        print(assignment)
         assignment_obj = Assignment(
             assignment_id=assignment[0],
             task_id=assignment[1],

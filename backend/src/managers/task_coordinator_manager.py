@@ -142,7 +142,8 @@ def get_all_assignments(user_id):
         user_data = {
             'user_id': user.user_id,
             'first_name': user.first_name,
-            'last_name': user.last_name
+            'last_name': user.last_name,
+            'assignment_id': assignment['assignment_id']
         }
         return user_data
 
@@ -156,7 +157,6 @@ def get_all_assignments(user_id):
     
             if task_id not in assignment_by_task:
                 assignment_by_task[task_id] = {
-                    'assignment_id': assignment['assignment_id'],
                     'task_name': assignment['task_name'],
                     'description': assignment['description'],
                     'users': [],
