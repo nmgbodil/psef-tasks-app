@@ -22,7 +22,7 @@ const SignInScreen: React.FC = () => {
             if (data.message === "Welcome to your profile") {
                 const access_token = data.access_token;
                 await saveToken(access_token);
-                navigation.replace("Home");
+                navigation.replace("CoordinatorNavigator");
             }
         }
         catch (error: any) {

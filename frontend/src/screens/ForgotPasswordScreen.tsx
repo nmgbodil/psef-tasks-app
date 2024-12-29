@@ -5,7 +5,8 @@ import { forgot_password } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/types";
 
 const ForgotPasswordScreen: React.FC = () => {
-    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const navigation = useNavigation();
+    const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
     const [email, setEmail] = useState<string>("");
 
     const handleForgotPassword = async () => {
@@ -58,7 +59,7 @@ const ForgotPasswordScreen: React.FC = () => {
                 <Text style={styles.buttonText}>Send Password Reset Email</Text>
             </TouchableOpacity>
             <View style={styles.login_row}>
-                <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
+                <TouchableOpacity onPress={() => parentNavigation.navigate("SignIn")}>
                     <Text style={styles.link}>Log in</Text>
                 </TouchableOpacity>
             </View>

@@ -22,7 +22,7 @@ const SplashScreen = ({ navigation }: any) => {
     const checkAuthStatus = async () => {
         const token = await getToken(); // Check for user login token
         if (token) {
-            navigation.replace("Home")
+            navigation.replace("CoordinatorNavigator")
         }
         else {
             navigation.replace("SignIn");

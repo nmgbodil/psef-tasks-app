@@ -1,7 +1,6 @@
 import axios, { AxiosError } from "axios";
 import { UserData } from "../navigation/types";
-
-const API_BASE_URL = "http://172.20.10.9:5000/api/v1"; // Get actual url when pushed to production
+import { API_BASE_URL } from "../constants/api_constants";
 
 // Axios instance with default configuration
 const apiClient = axios.create({
@@ -9,7 +8,7 @@ const apiClient = axios.create({
     headers: {
         "Content-Type": "application/json", // Default headers
     },
-})
+});
 
 // Helper functions for API calls
 export const register = async (userData: UserData) => {
@@ -22,7 +21,7 @@ export const register = async (userData: UserData) => {
         console.error("Register API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
-}
+};
 
 export const login = async (email: string, password: string) => {
     try {
@@ -59,6 +58,19 @@ export const forgot_password = async (email: string) => {
     catch (error) {
         const axiosError = error as AxiosError;
         console.error("Forgot password API Error:", axiosError.response?.data || axiosError.message);
-        throw axiosError.response?.data || { axiosrror: "Unknown error occurred" };
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
-}
+};
+
+export const fetch_user_data = async (access_token: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.get("tasks/user");
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Get User API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
+    }
+};

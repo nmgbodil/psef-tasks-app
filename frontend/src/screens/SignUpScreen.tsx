@@ -23,7 +23,14 @@ const SignUpScreen: React.FC = () => {
             return;
         }
 
-        const userData: UserData = { first_name, last_name, email, password };
+        const userData: UserData = {
+            user_id: null,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            password: password,
+            role: null
+        };
 
         try {
             const data = await register(userData);
