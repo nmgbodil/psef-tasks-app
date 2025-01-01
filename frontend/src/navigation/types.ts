@@ -13,23 +13,20 @@ export type RootStackParamList = {
 
 export type CoordinatorStackParamList = {
     Sidebar: undefined;
-    TaskDetails: {
-        task_id: string; task: {
-            task_name: string;
-            description: string;
-            start_time: string;
-            end_time: string;
-            users: {
-                user_id: string;
-                first_name: string;
-                last_name: string;
-                assignment_id: number;
-            }[]
+    TaskDetails: { task_id: string };
+    AssignTask: {
+        task_id: string;
+        user_data: {
+            user_id: string;
+            first_name: string;
+            last_name: string;
+            assignment_id: number;
         }
-    }
+    };
 };
 
 export type TaskDetailsProps = NativeStackScreenProps<CoordinatorStackParamList, "TaskDetails">;
+export type TaskMenuProps = NativeStackScreenProps<CoordinatorStackParamList, "AssignTask">;
 
 export interface UserData {
     user_id: string | null

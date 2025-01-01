@@ -49,10 +49,10 @@ export const create_task = async (access_token: string, task: TaskData) => {
     }
 };
 
-export const assign_task = async (access_token: string, task: TaskData) => {
+export const assign_task = async (access_token: string, assignee_id: string, task_id: string) => {
     try {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-        const response = await apiClient.post("tasks/coordinator/assign", task);
+        const response = await apiClient.post("tasks/coordinator/assign", {assignee_id, task_id});
         return response.data;
     }
     catch (error) {

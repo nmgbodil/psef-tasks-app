@@ -1,18 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList, TaskData, UserRole } from "../../navigation/types";
+import { RootStackParamList } from "../../navigation/types";
 import { getToken, removeToken } from "../../utils/auth_storage";
 import { fetch_user_data } from "../../services/auth_api_services";
-import { get_all_tasks } from "../../services/task_coordinator_api_services";
+import { useTasks } from "@/src/hooks/useTasksContext";
 
 const DashboardScreen: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [tasks, setTasks] = useState<any>({});
-    // const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+    const { tasks, getAllTasks } = useTasks();
     const navigation = useNavigation();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
+
+    useEffect(() => {
+        const fetchTasks = async () => {
+            await getAllTasks();
+        };
+
+        fetchTasks();
+    }, [getAllTasks])
 
     const fetchUserData = async () => {
         try {
@@ -33,27 +40,6 @@ const DashboardScreen: React.FC = () => {
             handleError(error);
         }
     };
-
-    const getAllTasks = async () => {
-        try {
-            const access_token = await getToken();
-            if (access_token) {
-                const data = await get_all_tasks(access_token);
-
-                if (data.message === "Assignments successfully retrieved") {
-                    return data;
-                }
-            }
-            else {
-                parentNavigation.navigate("SignIn");
-                // navigation.replace("SignIn");
-                return null;
-            }
-        }
-        catch (error: any) {
-            handleError(error);
-        }
-    }
 
     const handleError = (error: any) => {
         if (error.error) {
@@ -78,12 +64,6 @@ const DashboardScreen: React.FC = () => {
                 if (data) {
                     setUserData(data);
                 }
-
-                const tasks = await getAllTasks();
-                console.log(tasks['assignments'])
-                if (tasks) {
-                    setTasks(tasks);
-                }
             }
             catch (error) {
                 console.error("Error fetching data:", error);
@@ -104,29 +84,15 @@ const DashboardScreen: React.FC = () => {
         try {
             await removeToken();
             parentNavigation.navigate("SignIn");
-            // navigation.replace("SignIn");
         }
         catch (error) {
             Alert.alert("Error");
         }
     };
 
-    const handleTaskPress = (task_id: number, task: {
-        task_name: string;
-        description: string;
-        start_time: string;
-        end_time: string;
-        users: {
-            user_id: string;
-            first_name: string;
-            last_name: string;
-            assignment_id: number;
-        }[]
-        }
-    ) => {
-        parentNavigation.navigate("TaskDetails", { task_id, task });
+    const handleTaskPress = (task_id: number) => {
+        navigation.navigate("TaskDetails", { task_id })
     };
-   
 
     return (
         <View style={styles.container}>
@@ -135,7 +101,7 @@ const DashboardScreen: React.FC = () => {
             <View style={styles.task_container}>
                 <Text style={styles.subtitle}>Upcoming Tasks</Text>
                 {tasks?.sorted_tasks?.map((task_id: any) => (
-                    <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id, tasks?.assignments[task_id.toString()])}>
+                    <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
                         <Text>{tasks?.assignments[task_id.toString()]?.task_name}</Text>
                         <Text>From: {tasks?.assignments[task_id.toString()]?.start_time}</Text>
                         <Text>To: {tasks?.assignments[task_id.toString()]?.end_time}</Text>
@@ -155,8 +121,6 @@ const DashboardScreen: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        // justifyContent: "center",
-        // alignItems: "center",
         backgroundColor: "#FFFFFF",
         padding: 16,
     },
