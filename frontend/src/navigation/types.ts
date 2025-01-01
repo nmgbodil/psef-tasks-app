@@ -21,12 +21,22 @@ export type CoordinatorStackParamList = {
             first_name: string;
             last_name: string;
             assignment_id: number;
-        }
+        } | null;
+    };
+    UpdateTask: {
+        task_id: string;
+        user_data: {
+            user_id: string;
+            first_name: string;
+            last_name: string;
+            assignment_id: number;
+        } | null;
     };
 };
 
 export type TaskDetailsProps = NativeStackScreenProps<CoordinatorStackParamList, "TaskDetails">;
-export type TaskMenuProps = NativeStackScreenProps<CoordinatorStackParamList, "AssignTask">;
+export type AssignTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "AssignTask">;
+export type UpdateTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "UpdateTask">;
 
 export interface UserData {
     user_id: string | null
@@ -47,9 +57,8 @@ export interface TaskData {
     task_name: string | null;
     task_type: string | null;
     description: string | null;
-    users: UserData[] | null;
-    start_time: Date | null;
-    end_time: Date | null;
+    start_time: string | null;
+    end_time: string | null;
     max_participants: number | null;
     status: TaskStatus | null;
 };

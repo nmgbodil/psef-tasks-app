@@ -75,3 +75,16 @@ export const delete_task = async (access_token: string, task: TaskData) => {
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };
+
+export const update_task = async (access_token: string, task: TaskData, task_id: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.patch(`tasks/coordinator/update_task/${task_id}`, task);
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Update Task API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
+    }
+};

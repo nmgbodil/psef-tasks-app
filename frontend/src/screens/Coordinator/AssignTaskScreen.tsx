@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, FlatList, Alert } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { RootStackParamList, TaskMenuProps, UserRole } from "@/src/navigation/types";
+import { RootStackParamList, AssignTaskProps, UserRole } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { assign_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { useUsers } from "@/src/hooks/useUsersContext";
 
-const AssignTaskScreen = ({ route, navigation }: TaskMenuProps) => {
+const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
     const { task_id, user_data } = route.params;
     const { tasks, getAllTasks } = useTasks();
     const { users, getAllUsers } = useUsers();
@@ -98,23 +98,25 @@ const AssignTaskScreen = ({ route, navigation }: TaskMenuProps) => {
                 ItemSeparatorComponent={() => <View style={styles.separator} />}
                 />
             </View>
-            <Text style={styles.text}>Choose a member to assign to this task</Text>
-            <DropDownPicker
-            open={open}
-            value={selectedUser}
-            items={users}
-            setOpen={setOpen}
-            setValue={setSelectedUser}
-            placeholder="Select a club member..."
-            style={styles.dropDown}
-            dropDownContainerStyle={styles.dropDownContainer}
-            textStyle={styles.dropDownText}
-            placeholderStyle={styles.placeHolderStyle}
-            searchable
-            searchPlaceholder="Search members..."
-            searchTextInputStyle={styles.searchText}
-            searchContainerStyle={styles.searchContainer}
-            />
+            <View style={styles.DataEntry}>
+                <Text style={styles.text}>Choose a member to assign to this task</Text>
+                <DropDownPicker
+                open={open}
+                value={selectedUser}
+                items={users}
+                setOpen={setOpen}
+                setValue={setSelectedUser}
+                placeholder="Select a club member..."
+                style={styles.dropDown}
+                dropDownContainerStyle={styles.dropDownContainer}
+                textStyle={styles.dropDownText}
+                placeholderStyle={styles.placeHolderStyle}
+                searchable
+                searchPlaceholder="Search members..."
+                searchTextInputStyle={styles.searchText}
+                searchContainerStyle={styles.searchContainer}
+                />
+            </View>
         </View>
     );
 };
@@ -164,6 +166,9 @@ const styles = StyleSheet.create({
     separator: {
         height: 1,
         backgroundColor: "#e0e0e0",
+    },
+    DataEntry: {
+        marginTop: 20
     },
     text: {
         fontSize: 16,
