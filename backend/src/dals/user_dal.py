@@ -59,7 +59,7 @@ def get_all_users():
             email=user[3],
             role=user[4]
         )
-        user_list.append(user_obj.dict())
+        user_list.append(user_obj.dict(exclude={"password_hash", "verified"}))
     
     return user_list
 
