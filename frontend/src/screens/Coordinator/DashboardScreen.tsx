@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
 import { getToken, removeToken } from "../../utils/auth_storage";
@@ -95,30 +95,36 @@ const DashboardScreen: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
-            <Text style={styles.text}>Total Tasks:</Text>
-            <View style={styles.task_container}>
-                <Text style={styles.subtitle}>Upcoming Tasks</Text>
-                {tasks?.sorted_tasks?.map((task_id: any) => (
-                    <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
-                        <Text>{tasks?.assignments[task_id.toString()]?.task_name}</Text>
-                        <Text>From: {tasks?.assignments[task_id.toString()]?.start_time}</Text>
-                        <Text>To: {tasks?.assignments[task_id.toString()]?.end_time}</Text>
+        <SafeAreaView style={styles.safeContainer}>
+            <View style={styles.container}>
+                <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
+                <Text style={styles.text}>Total Tasks:</Text>
+                <View style={styles.task_container}>
+                    <Text style={styles.subtitle}>Upcoming Tasks</Text>
+                    {tasks?.sorted_tasks?.map((task_id: any) => (
+                        <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
+                            <Text>{tasks?.assignments[task_id.toString()]?.task_name}</Text>
+                            <Text>From: {tasks?.assignments[task_id.toString()]?.start_time}</Text>
+                            <Text>To: {tasks?.assignments[task_id.toString()]?.end_time}</Text>
+                        </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity>
+                        <Text style={styles.link}>View Full Calendar</Text>
                     </TouchableOpacity>
-                ))}
-                <TouchableOpacity>
-                    <Text style={styles.link}>View Full Calendar</Text>
+                </View>
+                <TouchableOpacity onPress={handleLogout}>
+                    <Text style={styles.link}>Log out</Text>
                 </TouchableOpacity>
             </View>
-            <TouchableOpacity onPress={handleLogout}>
-                <Text style={styles.link}>Log out</Text>
-            </TouchableOpacity>
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff"
+    },
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",

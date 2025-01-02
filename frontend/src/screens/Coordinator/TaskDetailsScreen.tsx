@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, SectionList, ScrollView, SafeAreaView } from "react-native";
 import {Menu, IconButton } from "react-native-paper";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { TaskDetailsProps } from "@/src/navigation/types";
@@ -85,57 +85,68 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     }
     
     return (
-        <View style={styles.container}>
-            <View style={styles.topRow}>
-                <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                <Menu
-                visible={taskMenuVisible}
-                onDismiss={closeTaskMenu}
-                anchor={
-                    <IconButton
-                    icon="dots-horizontal-circle"
-                    size={24}
-                    onPress={openTaskMenu}
-                    iconColor="#f0b44a"
-                    />
-                }
-                style={styles.menuContainer}
-                >
-                    <FlatList
-                    data={taskMenuOptions}
-                    keyExtractor={(item) => item.id}
-                    renderItem={({ item }) => renderMenuOption(item, null)}
-                    />
-                </Menu>
-            </View>
-            <Text style={styles.title}>{task?.task_name}</Text>
-            <View style={styles.taskDataContainer}>
-                <FlatList
-                data={taskData}
-                keyExtractor={(item) => item.key}
-                renderItem={({ item }) => (
-                    <View style={styles.row}>
-                        <Text style={styles.label}>{item.key}</Text>
-                        <Text style={styles.value}>{item.value}</Text>
+        <SafeAreaView style={styles.safeContainer}>
+            <View style={styles.container}>
+                <View style={styles.topRow}>
+                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
+                    <Menu
+                    visible={taskMenuVisible}
+                    onDismiss={closeTaskMenu}
+                    anchor={
+                        <IconButton
+                        icon="dots-horizontal-circle"
+                        size={24}
+                        onPress={openTaskMenu}
+                        iconColor="#f0b44a"
+                        />
+                    }
+                    style={styles.menuContainer}
+                    >
+                        <FlatList
+                        data={taskMenuOptions}
+                        keyExtractor={(item) => item.id}
+                        renderItem={({ item }) => renderMenuOption(item, null)}
+                        />
+                    </Menu>
+                </View>
+                <Text style={styles.title}>{task?.task_name}</Text>
+                <ScrollView>
+                    <View style={styles.taskDataContainer}>
+                        {taskData.map((item, index) => (
+                            <View key={index}>
+                                <View style={styles.row}>
+                                    <Text style={styles.label}>{item.key}</Text>
+                                    <Text style={styles.value}>{item.value}</Text>
+                                </View>
+                                {index < taskData.length - 1 && (
+                                    <View style={styles.separator1} />
+                                )}
+                            </View>
+                        ))}
                     </View>
-                )}
-                ItemSeparatorComponent={() => <View style={styles.separator1} />}
-                />
+                    {task?.users?.length > 0 ? (
+                        task?.users && task?.users.map((item, index) => (
+                            <React.Fragment key={item.user_id}>
+                                {renderItem(item)}
+                                {index < task?.users.length - 1 && (
+                                    <View style={styles.separator2} />
+                                )}
+                            </React.Fragment>
+                        ))
+                    ) : (
+                        <Text style={styles.emptyMessage}>No one signed up for this task</Text>
+                    )}
+                </ScrollView>
             </View>
-            <FlatList
-            data={task?.users || []}
-            renderItem={({ item }) => renderItem(item)}
-            keyExtractor={(item) => item.user_id}
-            ItemSeparatorComponent={() => <View style={styles.separator2} />}
-            ListEmptyComponent={
-                <Text style={styles.emptyMessage}>No one signed up for this task</Text>
-            }
-            />
-        </View>
+        </SafeAreaView>
     )
 };
 
 const styles = StyleSheet.create({
+    safeContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff"
+    },
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
@@ -145,7 +156,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        marginTop: 16,
     },
     menuContainer: {
         marginTop: 50,
@@ -181,6 +191,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        marginTop: 20
     },
     row: {
         flexDirection: "row",

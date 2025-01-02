@@ -1,11 +1,12 @@
 import React, { useState } from "react";
-import { View, Text, Button, StyleSheet, FlatList, Alert, TextInput, ScrollView } from "react-native";
+import { View, Text, Button, StyleSheet, FlatList, Alert, TextInput, ScrollView, KeyboardAvoidingView, Platform, StatusBar, SafeAreaView } from "react-native";
 import { RootStackParamList, TaskData, UpdateTaskProps } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { update_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const { task_id, user_data } = route.params;
@@ -44,9 +45,9 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
 
     const handleChooseDate = (date: Date) => {
         if (adj === "start") {
-            console.log(date);
             if ((!end_time || date < new Date(end_time)) && date >= new Date()) {
-                setStartTime(date.toLocaleString());
+                setStartTime(date.toISOString());
+                console.log(start_time);
             }
             else if (date >= new Date(end_time)){
                 Alert.alert("", "Start date must be before end date");
@@ -57,7 +58,8 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
         }
         else {
             if ((!start_time || date > new Date(start_time)) && date >= new Date()) {
-                setStartTime(date.toLocaleString());
+                setEndTime(date.toISOString());
+                // console.log(end_time);
             }
             else if (date <= new Date(start_time)) {
                 Alert.alert("", "End date must be after start date");
@@ -117,96 +119,113 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     };
 
     return (
-        <ScrollView style={styles.container}>
-            <View style={styles.topRow}>
-                <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+        <SafeAreaView style={styles.safeContainer}>
+            <View style={styles.container}>
+                <View style={styles.topRow}>
+                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
+                    <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+                </View>
+                <Text style={styles.title}>{task?.task_name}</Text>
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <KeyboardAwareScrollView
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps="handled"
+                    >
+                        <View style={styles.taskDataContainer}>
+                            {taskData.map((item, index) => (
+                                <View key={index}>
+                                    <View style={styles.row}>
+                                        <Text style={styles.label}>{item.key}</Text>
+                                        <Text style={styles.value}>{item.value}</Text>
+                                    </View>
+                                    {index < taskData.length - 1 && (
+                                        <View style={styles.separator} />
+                                    )}
+                                </View>
+                            ))}
+                        </View>
+                        <View style={styles.DataEntry}>
+                            <Text style={styles.text}>Task Name</Text>
+                            <TextInput
+                                placeholder="Enter a new task name"
+                                placeholderTextColor="#A0A0A0"
+                                value={name}
+                                onChangeText={setName}
+                                style={styles.inputText}
+                                autoCapitalize="words"
+                            />
+                            <Text style={styles.text}>Task Type</Text>
+                            <TextInput
+                                placeholder="Enter a new task type"
+                                placeholderTextColor="#A0A0A0"
+                                value={type}
+                                onChangeText={setType}
+                                style={styles.inputText}
+                                autoCapitalize="words"
+                            />
+                            <Text style={styles.text}>Description</Text>
+                            <TextInput
+                                placeholder="Enter a new task description"
+                                placeholderTextColor="#A0A0A0"
+                                value={description}
+                                onChangeText={setDescription}
+                                style={styles.inputText}
+                                autoCapitalize="sentences"
+                            />
+                            <Text style={styles.text}>Start Date & Time</Text>
+                            <Text style={styles.dateText}>{start_time || "No date selected"}</Text>
+                            <Button title="Pick Date & Time" onPress={() => {setAdj("start"); showDatePicker();}} />
+                            <DateTimePickerModal
+                                isVisible={open[adj]}
+                                mode="datetime"
+                                onConfirm={handleChooseDate}
+                                onCancel={hideDatePicker}
+                            />
+                            <Text style={styles.text}>End Date & Time</Text>
+                            <Text style={styles.dateText}>{end_time || "No date selected"}</Text>
+                            <Button title="Pick Date & Time" onPress={() => {setAdj("end"); showDatePicker();}} />
+                            <DateTimePickerModal
+                                isVisible={open[adj]}
+                                mode="datetime"
+                                onConfirm={handleChooseDate}
+                                onCancel={hideDatePicker}
+                            />
+                            <Text style={styles.text}>Maximum number of participants</Text>
+                            <TextInput
+                                placeholder="0"
+                                placeholderTextColor="#A0A0A0"
+                                value={max_participants.toString()}
+                                onChangeText={handleNumberChange}
+                                style={styles.numberInput}
+                                keyboardType="numeric"
+                            />
+                        </View>
+                    </KeyboardAwareScrollView>
+                </KeyboardAvoidingView>
             </View>
-            <Text style={styles.title}>{task?.task_name}</Text>
-            <View style={styles.taskDataContainer}>
-                <FlatList
-                data={taskData}
-                keyExtractor={(item) => item.key}
-                renderItem={({ item }) => (
-                    <View style={styles.row}>
-                        <Text style={styles.label}>{item.key}</Text>
-                        <Text style={styles.value}>{item.value}</Text>
-                    </View>
-                )}
-                ItemSeparatorComponent={() => <View style={styles.separator} />}
-                />
-            </View>
-            <View style={styles.DataEntry}>
-                <Text style={styles.text}>Task Name</Text>
-                <TextInput
-                    placeholder="Enter a new task name"
-                    placeholderTextColor="#A0A0A0"
-                    value={name}
-                    onChangeText={setName}
-                    style={styles.inputText}
-                    autoCapitalize="words"
-                />
-                <Text style={styles.text}>Task Type</Text>
-                <TextInput
-                    placeholder="Enter a new task type"
-                    placeholderTextColor="#A0A0A0"
-                    value={type}
-                    onChangeText={setType}
-                    style={styles.inputText}
-                    autoCapitalize="words"
-                />
-                <Text style={styles.text}>Description</Text>
-                <TextInput
-                    placeholder="Enter a new task description"
-                    placeholderTextColor="#A0A0A0"
-                    value={description}
-                    onChangeText={setDescription}
-                    style={styles.inputText}
-                    autoCapitalize="sentences"
-                />
-                <Text style={styles.text}>Start Date & Time</Text>
-                <Text style={styles.dateText}>{start_time || "No date selected"}</Text>
-                <Button title="Pick Date & Time" onPress={() => {setAdj("start"); showDatePicker();}} />
-                <DateTimePickerModal
-                    isVisible={open[adj]}
-                    mode="datetime"
-                    onConfirm={handleChooseDate}
-                    onCancel={hideDatePicker}
-                />
-                <Text style={styles.text}>End Date & Time</Text>
-                <Text style={styles.dateText}>{end_time || "No date selected"}</Text>
-                <Button title="Pick Date & Time" onPress={() => {setAdj("end"); showDatePicker();}} />
-                <DateTimePickerModal
-                    isVisible={open[adj]}
-                    mode="datetime"
-                    onConfirm={handleChooseDate}
-                    onCancel={hideDatePicker}
-                />
-                <Text style={styles.text}>Maximum number of participants</Text>
-                <TextInput
-                    placeholder="0"
-                    placeholderTextColor="#A0A0A0"
-                    value={max_participants.toString()}
-                    onChangeText={handleNumberChange}
-                    style={styles.numberInput}
-                    keyboardType="numeric"
-                />
-            </View>
-        </ScrollView>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff"
+    },
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
-        padding: 16,
+        // padding: 16,
+        paddingTop: 16,
+        paddingHorizontal: 16
     },
     topRow: {
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        marginTop: 16,
     },
     title: {
         fontSize: 28,
@@ -224,6 +243,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        marginTop: 20
     },
     row: {
         flexDirection: "row",

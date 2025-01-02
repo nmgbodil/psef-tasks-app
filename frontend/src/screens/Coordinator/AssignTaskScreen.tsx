@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, FlatList, Alert } from "react-native";
+import { View, Text, Button, StyleSheet, FlatList, Alert, SafeAreaView } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
 import { RootStackParamList, AssignTaskProps, UserRole } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
@@ -79,49 +79,55 @@ const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
     };
 
     return (
-        <View style={styles.container}>
-            <View style={styles.topRow}>
-                <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+        <SafeAreaView style={styles.safeContainer}>
+            <View style={styles.container}>
+                <View style={styles.topRow}>
+                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
+                    <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+                </View>
+                <Text style={styles.title}>{task?.task_name}</Text>
+                <View style={styles.taskDataContainer}>
+                    {taskData.map((item, index) => (
+                        <View key={index}>
+                            <View style={styles.row}>
+                                <Text style={styles.label}>{item.key}</Text>
+                                <Text style={styles.value}>{item.value}</Text>
+                            </View>
+                            {index < taskData.length - 1 && (
+                                <View style={styles.separator} />
+                            )}
+                        </View>
+                    ))}
+                </View>
+                <View style={styles.DataEntry}>
+                    <Text style={styles.text}>Choose a member to assign to this task</Text>
+                    <DropDownPicker
+                    open={open}
+                    value={selectedUser}
+                    items={users}
+                    setOpen={setOpen}
+                    setValue={setSelectedUser}
+                    placeholder="Select a club member..."
+                    style={styles.dropDown}
+                    dropDownContainerStyle={styles.dropDownContainer}
+                    textStyle={styles.dropDownText}
+                    placeholderStyle={styles.placeHolderStyle}
+                    searchable
+                    searchPlaceholder="Search members..."
+                    searchTextInputStyle={styles.searchText}
+                    searchContainerStyle={styles.searchContainer}
+                    />
+                </View>
             </View>
-            <Text style={styles.title}>{task?.task_name}</Text>
-            <View style={styles.taskDataContainer}>
-                <FlatList
-                data={taskData}
-                keyExtractor={(item) => item.key}
-                renderItem={({ item }) => (
-                    <View style={styles.row}>
-                        <Text style={styles.label}>{item.key}</Text>
-                        <Text style={styles.value}>{item.value}</Text>
-                    </View>
-                )}
-                ItemSeparatorComponent={() => <View style={styles.separator} />}
-                />
-            </View>
-            <View style={styles.DataEntry}>
-                <Text style={styles.text}>Choose a member to assign to this task</Text>
-                <DropDownPicker
-                open={open}
-                value={selectedUser}
-                items={users}
-                setOpen={setOpen}
-                setValue={setSelectedUser}
-                placeholder="Select a club member..."
-                style={styles.dropDown}
-                dropDownContainerStyle={styles.dropDownContainer}
-                textStyle={styles.dropDownText}
-                placeholderStyle={styles.placeHolderStyle}
-                searchable
-                searchPlaceholder="Search members..."
-                searchTextInputStyle={styles.searchText}
-                searchContainerStyle={styles.searchContainer}
-                />
-            </View>
-        </View>
+        </SafeAreaView>
     );
 };
 
 const styles = StyleSheet.create({
+    safeContainer: {
+        flex: 1,
+        backgroundColor: "#ffffff"
+    },
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
@@ -131,7 +137,6 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "flex-start",
         justifyContent: "space-between",
-        marginTop: 16,
     },
     title: {
         fontSize: 28,
@@ -149,6 +154,7 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
+        marginTop:20
     },
     row: {
         flexDirection: "row",
