@@ -6,9 +6,11 @@ interface TasksContextType {
     tasks: {
         message: string;
         sorted_tasks: string[];
-        assignments: {
+        tasks: {
             [key: string]: {
                 task_name: string;
+                task_type: string;
+                max_participants: number | null;
                 description: string;
                 start_time: string;
                 end_time: string;
@@ -39,7 +41,7 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({ children }: any) =
             if (access_token) {
                 const data = await get_all_tasks(access_token);
 
-                if (data?.message === "Assignments successfully retrieved") {
+                if (data?.message === "Tasks successfully retrieved") {
                     setTasks(data);
                 }
             }

@@ -15,11 +15,12 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const [assignment_deleted, setAssignmentDeleted] = useState<string>("0");
     const { task_id } = route.params;
     const { tasks, getAllTasks } = useTasks();
-    const task = tasks?.assignments[task_id.toString()];
+    const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
+        {key: "Category", value: task?.task_type || "No Category"},
         {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
         {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
     ];
@@ -199,6 +200,15 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
                                 )}
                             </View>
                         ))}
+                        {task?.max_participants && (
+                            <View>
+                                <View style={styles.separator1} />
+                                <View style={styles.row}>
+                                        <Text style={styles.label}>Maximum number of participants</Text>
+                                        <Text style={styles.value}>{task?.max_participants}</Text>
+                                </View>
+                            </View>
+                        )}
                     </View>
                     {task?.users?.length > 0 ? (
                         task?.users && task?.users.map((item, index) => (

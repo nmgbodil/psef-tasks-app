@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
 import { getToken, removeToken } from "../../utils/auth_storage";
 import { fetch_user_data } from "../../services/auth_api_services";
 import { useTasks } from "@/src/hooks/useTasksContext";
+import { IconButton } from "react-native-paper";
 
 const DashboardScreen: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
@@ -19,7 +20,13 @@ const DashboardScreen: React.FC = () => {
         };
 
         fetchTasks();
-    }, [getAllTasks])
+    }, []);
+
+    const quickActions = [
+        {label: "Create task", icon: "plus-circle", navigation: ""},
+        {label: "Assign task", icon: "account", navigation: ""},
+        {label: "Delete task", icon: "delete", navigation: ""},
+    ];
 
     const fetchUserData = async () => {
         try {
@@ -94,18 +101,23 @@ const DashboardScreen: React.FC = () => {
         navigation.navigate("TaskDetails", { task_id })
     };
 
+    const handleQuickActionPress = (label: string) => {
+        if (label === "Create task") {
+            navigation.navigate("CreateTask");
+        }
+    }
+
     return (
         <SafeAreaView style={styles.safeContainer}>
-            <View style={styles.container}>
+            <ScrollView style={styles.container}>
                 <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
-                <Text style={styles.text}>Total Tasks:</Text>
                 <View style={styles.task_container}>
                     <Text style={styles.subtitle}>Upcoming Tasks</Text>
                     {tasks?.sorted_tasks?.map((task_id: any) => (
                         <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
-                            <Text>{tasks?.assignments[task_id.toString()]?.task_name}</Text>
-                            <Text>From: {tasks?.assignments[task_id.toString()]?.start_time}</Text>
-                            <Text>To: {tasks?.assignments[task_id.toString()]?.end_time}</Text>
+                            <Text>{tasks?.tasks[task_id.toString()]?.task_name}</Text>
+                            <Text>From: {tasks?.tasks[task_id.toString()]?.start_time}</Text>
+                            <Text>To: {tasks?.tasks[task_id.toString()]?.end_time}</Text>
                         </TouchableOpacity>
                     ))}
                     <TouchableOpacity>
@@ -115,7 +127,16 @@ const DashboardScreen: React.FC = () => {
                 <TouchableOpacity onPress={handleLogout}>
                     <Text style={styles.link}>Log out</Text>
                 </TouchableOpacity>
-            </View>
+                <View style={styles.actionsContainer}>
+                    <Text style={styles.subtitle}>Quick Actions</Text>
+                    {quickActions.map((item, index) => (
+                            <TouchableOpacity key={index} style={styles.action} onPress={() => {handleQuickActionPress(item.label)}}>
+                                <Text style={styles.actionText}>{item?.label}</Text>
+                                <IconButton icon={item.icon} size={25} iconColor="black" />
+                            </TouchableOpacity>
+                    ))}
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -157,6 +178,24 @@ const styles = StyleSheet.create({
         fontSize: 14,
         color: "blue",
         textDecorationLine: "underline",
+    },
+    actionsContainer: {
+        marginTop: 15
+    },
+    action: {
+        marginBottom: 8,
+        padding: 8,
+        backgroundColor: "#f9f9f9",
+        borderRadius: 15,
+        height: 50,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        width: "50%"
+    },
+    actionText: {
+        fontSize: 16,
+        fontWeight: "400"
     }
 });
 

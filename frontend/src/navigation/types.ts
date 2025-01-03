@@ -41,6 +41,7 @@ export type CoordinatorStackParamList = {
             assignment_id: number;
         } | null;
     };
+    CreateTask: undefined;
 };
 
 export type TaskDetailsProps = NativeStackScreenProps<CoordinatorStackParamList, "TaskDetails">;

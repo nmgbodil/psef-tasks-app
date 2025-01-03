@@ -12,12 +12,13 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
     const { task_id, user_data } = route.params;
     const { tasks, getAllTasks } = useTasks();
     const { users, getAllUsers } = useUsers();
-    const task = tasks?.assignments[task_id.toString()];
+    const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
     const assignment_id = user_data?.assignment_id?.toString();
 
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
+        {key: "Category", value: task?.task_type || "No Category"},
         {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
         {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
     ];
@@ -96,6 +97,15 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
                             )}
                         </View>
                     ))}
+                    {task?.max_participants && (
+                        <View>
+                            <View style={styles.separator} />
+                            <View style={styles.row}>
+                                    <Text style={styles.label}>Maximum number of participants</Text>
+                                    <Text style={styles.value}>{task?.max_participants}</Text>
+                            </View>
+                        </View>
+                    )}
                 </View>
                 <View style={styles.DataEntry}>
                     <Text style={styles.text}>Choose a new member to reassign to this task</Text>

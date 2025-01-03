@@ -1,26 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from "react-native";
-import { RootStackParamList, TaskData, UpdateTaskProps } from "@/src/navigation/types";
+import { RootStackParamList, TaskData } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
-import { update_task } from "@/src/services/task_coordinator_api_services";
-import { NavigationProp } from "@react-navigation/native";
+import { create_task } from "@/src/services/task_coordinator_api_services";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons"
 
-const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
-    const { task_id, user_data } = route.params;
-    const { tasks, getAllTasks } = useTasks();
-    const task = tasks?.tasks[task_id.toString()];
+const CreateTaskScreen = () => {
+    const { getAllTasks } = useTasks();
+    const navigation = useNavigation();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
-
-    const taskData = [
-        {key: "Description", value: task?.description || "No description"},
-        {key: "Category", value: task?.task_type || "No Category"},
-        {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
-        {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
-    ];
 
     const [name, setName] = useState<string>("");
     const [type, setType] = useState<string>("");
@@ -82,6 +74,9 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const handleError = (error: any) => {
         if (error.error) {
             switch (error.error) {
+                case "Task has already been created":
+                    Alert.alert("", "This task already exists");
+                    break;
                 case "Unauthorized":
                     Alert.alert("Error", "This account is unauthorized for this action");
                     break;
@@ -96,8 +91,8 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
         try {
             const access_token = await getToken();
             console.log(max_participants);
-            if ((name || type || description || start_time || end_time || max_participants) && access_token && max_participants != 0) {
-                const task_updates: TaskData = {
+            if (name && type && description && start_time && end_time && access_token && max_participants != 0) {
+                const task: TaskData = {
                     task_id: null,
                     task_name: name,
                     task_type: type,
@@ -107,9 +102,9 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                     max_participants: max_participants,
                     status: null
                 };
-                const data = await update_task(access_token, task_updates, task_id);
-                if (data.message === "Task successfully updated") {
-                    Alert.alert("Success", "Task was successfully updated");
+                const data = await create_task(access_token, task);
+                if (data.message === "Task successfully created") {
+                    Alert.alert("Success", "Task was successfully created");
                     await getAllTasks();
                     navigation.goBack();
                 }
@@ -118,7 +113,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                 Alert.alert("", "Maximum number of participants cannot be 0");
             }
             else if (access_token) {
-                Alert.alert("", "Please enter at least one field");
+                Alert.alert("", "Please fill al required fields");
             }
             else {
                 parentNavigation.navigate("SignIn");
@@ -136,7 +131,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                     <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
                     <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
                 </View>
-                <Text style={styles.title}>{task?.task_name}</Text>
+                <Text style={styles.title}>Create a new task</Text>
                 <KeyboardAvoidingView
                     style={{ flex: 1 }}
                     behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -145,30 +140,8 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                         contentContainerStyle={{ flexGrow: 1 }}
                         keyboardShouldPersistTaps="handled"
                     >
-                        <View style={styles.taskDataContainer}>
-                            {taskData.map((item, index) => (
-                                <View key={index}>
-                                    <View style={styles.row}>
-                                        <Text style={styles.label}>{item.key}</Text>
-                                        <Text style={styles.value}>{item.value}</Text>
-                                    </View>
-                                    {index < taskData.length - 1 && (
-                                        <View style={styles.separator} />
-                                    )}
-                                </View>
-                            ))}
-                            {task?.max_participants && (
-                                <View>
-                                    <View style={styles.separator} />
-                                    <View style={styles.row}>
-                                            <Text style={styles.label}>Maximum number of participants</Text>
-                                            <Text style={styles.value}>{task?.max_participants}</Text>
-                                    </View>
-                                </View>
-                            )}
-                        </View>
                         <View style={styles.DataEntry}>
-                            <Text style={styles.text}>Task Name</Text>
+                            <Text style={styles.text}>Task Name*</Text>
                             <TextInput
                                 placeholder="Enter a new task name"
                                 placeholderTextColor="#A0A0A0"
@@ -177,7 +150,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                                 style={styles.inputText}
                                 autoCapitalize="words"
                             />
-                            <Text style={styles.text}>Task Type</Text>
+                            <Text style={styles.text}>Task Type*</Text>
                             <TextInput
                                 placeholder="Enter a new task type"
                                 placeholderTextColor="#A0A0A0"
@@ -186,7 +159,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                                 style={styles.inputText}
                                 autoCapitalize="words"
                             />
-                            <Text style={styles.text}>Description</Text>
+                            <Text style={styles.text}>Description*</Text>
                             <TextInput
                                 placeholder="Enter a new task description"
                                 placeholderTextColor="#A0A0A0"
@@ -195,7 +168,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                                 style={styles.inputText}
                                 autoCapitalize="sentences"
                             />
-                            <Text style={styles.text}>Start Date & Time</Text>
+                            <Text style={styles.text}>Start Date & Time*</Text>
                             <Text style={styles.dateText}>{start_time || "No date selected"}</Text>
                             <Button title="Pick Date & Time" onPress={() => {setAdj("start"); showDatePicker();}} />
                             <DateTimePickerModal
@@ -204,7 +177,7 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                                 onConfirm={handleChooseDate}
                                 onCancel={hideDatePicker}
                             />
-                            <Text style={styles.text}>End Date & Time</Text>
+                            <Text style={styles.text}>End Date & Time*</Text>
                             <Text style={styles.dateText}>{end_time || "No date selected"}</Text>
                             <Button title="Pick Date & Time" onPress={() => {setAdj("end"); showDatePicker();}} />
                             <DateTimePickerModal
@@ -245,7 +218,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#FFFFFF",
-        // padding: 16,
         paddingTop: 16,
         paddingHorizontal: 16
     },
@@ -258,36 +230,6 @@ const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: "bold",
         textAlign: "center",
-    },
-    taskDataContainer: {
-        backgroundColor: "#f8f8f8",
-        padding: 20,
-        borderRadius: 15,
-        width: "100%",
-        overflow: "hidden",
-        elevation: 2,
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        marginTop: 20
-    },
-    row: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingVertical: 10,
-    },
-    label: {
-        fontSize: 16,
-        color: "#333",
-    },
-    value: {
-        fontSize: 16,
-        color: "#666"
-    },
-    separator: {
-        height: 1,
-        backgroundColor: "#e0e0e0",
     },
     DataEntry: {
         marginTop: 20
@@ -325,4 +267,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default UpdateTaskScreen;
+export default CreateTaskScreen;

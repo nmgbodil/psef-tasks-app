@@ -13,7 +13,7 @@ const apiClient = axios.create({
 export const get_all_tasks = async (access_token: string) => {
     try {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-        const response = await apiClient.get("tasks/coordinator/all_assignments");
+        const response = await apiClient.get("tasks/coordinator/all_tasks");
         return response.data;
     }
     catch (error) {
