@@ -27,11 +27,9 @@ def create_task():
             task_type=data.get('task_type'),
             description=data.get('description'),
             start_time=data.get('start_time'),
-            end_time=data.get('end_time')
+            end_time=data.get('end_time'),
+            max_participants=data.get('max_participants')
         )
-
-        if 'max_participants' in data:
-            task.max_participants = data.get('max_participants')
 
         # Attempt to create the task
         result = task_coordinator_manager.create_task(user_id, task)
@@ -197,7 +195,8 @@ def get_all_tasks():
 
         if message == 'tasks successfully retrieved':
             task_list = result.get('task_list')
-            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': task_list}), HTTP_200_OK
+            sorted_tasks = result.get('sorted_tasks')
+            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': task_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
         elif message == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
         else:

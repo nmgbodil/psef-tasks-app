@@ -20,28 +20,24 @@ def get_task_by_id(task_id):
     return task
 
 def get_all_tasks():
-    statement = f'''SELECT * FROM tasks
-    WHERE start_time >= CURRENT_TIMESTAMP
-    ORDER BY start_time ASC;
+    statement = f'''SELECT t.task_id AS task_name,
+    t.task_name AS task_name,
+    t.task_type AS task_type,
+    t.description AS description,
+    t.start_time AS start_time,
+    t.end_time AS end_time,
+    t.max_participants AS max_participants,
+    string_agg(a.user_id || ':' || a.assignment_id, ',') AS user_assignments
+    FROM tasks t
+    LEFT JOIN assignments a ON t.task_id = a.task_id
+    WHERE t.start_time >= CURRENT_TIMESTAMP
+    GROUP BY t.task_id
+    ORDER BY t.start_time;
     '''
 
     tasks = sync_db_util.execute_query_fetchall(statement)
-    task_list = []
 
-    for task in tasks:
-        task_obj = Task(
-            task_id=task[0],
-            task_name=task[1],
-            task_type=task[2],
-            description=task[3],
-            start_time=task[4],
-            end_time=task[5],
-            max_participants=task[6],
-            status=task[7],
-        )
-        task_list.append(task_obj.dict())
-
-    return task_list
+    return tasks
 
 def check_task_exists(task: Task):
     statement = f'''SELECT EXISTS(
@@ -70,7 +66,7 @@ def delete_task(task_id):
     sync_db_util.execute_query_return_row_count(statement)
 
 def update_task(task_id, updates: dict):
-    update_query = [f"{key} = {value}" for key, value in updates.items()]
+    update_query = [f"{key} = '{value}'" for key, value in updates.items()]
 
     statement = f'''UPDATE tasks SET {', '.join(update_query)} WHERE task_id = '{task_id}';'''
 

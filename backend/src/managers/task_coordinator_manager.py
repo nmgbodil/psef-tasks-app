@@ -86,11 +86,15 @@ def delete_assignment(user_id: str, assignment_id: str):
         return 'error'
     
 def update_task(user_id: str, updates: dict, task_id: str):
+    def handleUpdates(updates):
+        new_updates = {key: value for key, value in updates.items() if value}
+        return new_updates
     try:
         # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
             return 'user unauthorized'
         
+        updates = handleUpdates(updates)
         task_dal.update_task(task_id, updates)
         return 'task successfully updated'
     
@@ -120,7 +124,43 @@ def update_assignment(user_id: str, assignee_id: str, assignment_id: str):
         return 'error'
 
 def get_all_tasks(user_id: str):
-    results = {'message': None, 'task_list': None}
+    def handleUserData(user_id, assignment_id):
+        user = user_dal.get_user_by_id(user_id)
+        user_data = {
+            'user_id': user.user_id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'assignment_id': assignment_id
+        }
+        return user_data
+
+    def handleAllAssignments(task_list):
+        tasks = {}
+        sorted_tasks = []
+
+        for task in task_list:
+            task_id = task[0]
+            tasks[task_id] = {}
+            tasks[task_id]['task_name'] = task[1]
+            tasks[task_id]['task_type'] = task[2]
+            tasks[task_id]['description'] = task[3]
+            tasks[task_id]['start_time'] = task[4]
+            tasks[task_id]['end_time'] = task[5]
+            tasks[task_id]['max_participants'] = task[6]
+            tasks[task_id]['users'] = []
+
+            sorted_tasks.append(task_id)
+
+            if task[7]:
+                pairs = task[7].split(',')
+                for pair in pairs:
+                    user_id, assignment_id = pair.split(':')
+                    tasks[task_id]['users'].append(handleUserData(user_id, assignment_id))
+        
+        return tasks, sorted_tasks
+    
+
+    results = {'message': None, 'task_list': None, 'sorted_tasks': None}
 
     try:
         # Access control for coordinators only
@@ -128,7 +168,10 @@ def get_all_tasks(user_id: str):
             results['message'] = 'user_unauthorized'
             return results
         
-        results['task_list'] = task_dal.get_all_tasks()
+        task_list = task_dal.get_all_tasks()
+        response = handleAllAssignments(task_list)
+        results['task_list'] = response[0]
+        results['sorted_tasks'] = response[1]
         results['message'] = 'tasks successfully retrieved'
         return results
     
