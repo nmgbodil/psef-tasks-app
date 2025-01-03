@@ -62,16 +62,28 @@ export const assign_task = async (access_token: string, assignee_id: string, tas
     }
 };
 
-// Need to figure out how to pass things through path
-export const delete_task = async (access_token: string, task: TaskData) => {
+export const delete_task = async (access_token: string, task_id: string) => {
     try {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-        const response = await apiClient.delete("tasks/coordinator/assign");
+        const response = await apiClient.delete(`tasks/coordinator/delete_task/${task_id}`);
         return response.data;
     }
     catch (error) {
         const axiosError = error as AxiosError;
-        console.error("Assign Task API Error:", axiosError.response?.data || axiosError.message);
+        console.error("Delete Task API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
+    }
+};
+
+export const delete_assignment = async (access_token: string, assignment_id: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.delete(`tasks/coordinator/delete_assignment/${assignment_id}`);
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Delete Assignment API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };
@@ -85,6 +97,19 @@ export const update_task = async (access_token: string, task: TaskData, task_id:
     catch (error) {
         const axiosError = error as AxiosError;
         console.error("Update Task API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
+    }
+};
+
+export const update_assignment = async (access_token: string, assignment_id: string, assignee_id: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.patch(`tasks/coordinator/update_assignment/${assignment_id}`, { assignee_id });
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Update Assignment API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
     }
 };

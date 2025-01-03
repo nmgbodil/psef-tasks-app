@@ -5,6 +5,7 @@ import TaskDetailsScreen from "../screens/Coordinator/TaskDetailsScreen";
 import { CoordinatorStackParamList } from "./types";
 import AssignTaskScreen from "../screens/Coordinator/AssignTaskScreen";
 import UpdateTaskScreen from "../screens/Coordinator/UpdateTaskScreen";
+import UpdateAssignmentScreen from "../screens/Coordinator/UpdateAssignmentScreen";
 
 const Stack = createNativeStackNavigator<CoordinatorStackParamList>();
 
@@ -18,6 +19,7 @@ const CoordinatorNavigator = () => {
             <Stack.Screen name="TaskDetails" component={TaskDetailsScreen} options={{ title: "Task Details" }} />
             <Stack.Screen name="AssignTask" component={AssignTaskScreen} options={{ title: "Assign Task" }} />
             <Stack.Screen name="UpdateTask" component={UpdateTaskScreen} options={{ title: "Update Task" }} />
+            <Stack.Screen name="UpdateAssignment" component={UpdateAssignmentScreen} options={{ title: "Update Assignment" }} />
         </Stack.Navigator>
     );
 };

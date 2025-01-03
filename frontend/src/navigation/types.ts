@@ -32,11 +32,21 @@ export type CoordinatorStackParamList = {
             assignment_id: number;
         } | null;
     };
+    UpdateAssignment: {
+        task_id: string;
+        user_data: {
+            user_id: string;
+            first_name: string;
+            last_name: string;
+            assignment_id: number;
+        } | null;
+    };
 };
 
 export type TaskDetailsProps = NativeStackScreenProps<CoordinatorStackParamList, "TaskDetails">;
 export type AssignTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "AssignTask">;
 export type UpdateTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "UpdateTask">;
+export type UpdateAssignmentProps = NativeStackScreenProps<CoordinatorStackParamList, "UpdateAssignment">;
 
 export interface UserData {
     user_id: string | null
@@ -67,4 +77,11 @@ export enum TaskStatus {
     Pending = "Pending",
     Complete = "Complete",
     Incomplete = "Incomplete"
+};
+
+export type ConfirmModalProps = {
+    visible: boolean;
+    message: string;
+    onConfirm: () => void;
+    onCancel: () => void;
 };

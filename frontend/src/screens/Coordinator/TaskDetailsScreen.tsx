@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, SectionList, ScrollView, SafeAreaView } from "react-native";
+import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, SectionList, ScrollView, SafeAreaView, Alert } from "react-native";
 import {Menu, IconButton } from "react-native-paper";
 import { useTasks } from "@/src/hooks/useTasksContext";
-import { TaskDetailsProps } from "@/src/navigation/types";
+import { RootStackParamList, TaskDetailsProps } from "@/src/navigation/types";
+import ConfirmModal from "@/src/components/ConfirmModal";
+import { getToken } from "@/src/utils/auth_storage";
+import { delete_assignment, delete_task } from "@/src/services/task_coordinator_api_services";
+import { NavigationProp } from "@react-navigation/native";
 
 const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const [userVisibleMenus, setUserVisibleMenus] = useState<{ [key: string]: boolean }>({});
     const [taskMenuVisible, setTaskMenuVisible] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState<{ [key: string]: boolean }>({"task": false, "assignment": false});
+    const [assignment_deleted, setAssignmentDeleted] = useState<string>("0");
     const { task_id } = route.params;
-    const { tasks } = useTasks();
+    const { tasks, getAllTasks } = useTasks();
     const task = tasks?.assignments[task_id.toString()];
+    const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
@@ -19,10 +26,8 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
 
     const menuOptionNavigation = {
         "Edit task": "UpdateTask",
-        "Delete task": "DeleteTask",
         "Assign task": "AssignTask",
         "Edit assignment": "UpdateAssignment",
-        "Delete asignment": "DeleteAssignment",
     };
 
     const userMenuOptions = [
@@ -32,8 +37,8 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
 
     const taskMenuOptions = [
         {id: "1", title: "Edit task", icon: "pencil"},
-        {id: "2", title: "Delete task", icon: "delete"},
-        {id: "3", title: "Assign task", icon: "account"},
+        {id: "2", title: "Assign task", icon: "account"},
+        {id: "3", title: "Delete task", icon: "delete"},
     ]
 
     const openUserMenu = (user_id: string) => {
@@ -81,8 +86,79 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const handleMenuOptionPress = (title: string, user_data: { user_id: string; first_name: string; last_name: string; assignment_id: number } | null) => {
         closeTaskMenu();
         if (user_data) closeUserMenu(user_data.user_id);
-        navigation.navigate(menuOptionNavigation[title], { task_id, user_data });
+        if (title === "Delete task") {
+            openModal("task");
+        }
+        else if (title === "Drop assignment") {
+            setAssignmentDeleted(user_data?.assignment_id.toString() || "0");
+            openModal("assignment");
+        }
+        else {
+            navigation.navigate(menuOptionNavigation[title], { task_id, user_data });
+        }
     }
+
+    const openModal = (adj: string) => {
+        setIsModalVisible((prev) => ({ ...prev, [adj]: true}));
+    };
+    const closeModal = (adj: string) => {
+        setIsModalVisible((prev) => ({ ...prev, [adj]: false}));
+    }
+
+    const confirmDeleteTask = async () => {
+        closeModal("task");
+        try {
+            const access_token = await getToken();
+            if (access_token) {
+                const data = await delete_task(access_token, task_id);
+
+                if (data.message === "Task successfully deleted") {
+                    Alert.alert("Success", "Task successfully deleted");
+                    await getAllTasks();
+                    navigation.navigate("Sidebar");
+                    return;
+                }
+            }
+            else {
+                parentNavigation.navigate("SignIn");
+                return;
+            }
+        }
+        catch (error: any) {
+            Alert.alert("Error", error?.error);
+        }
+    };
+
+    const cancelDeleteTask = () => {
+        closeModal("task")
+    };
+
+    const confirmDeleteAssignment = async () => {
+        closeModal("assignment");
+        try {
+            const access_token = await getToken();
+            if (access_token) {
+                const data = await delete_assignment(access_token, assignment_deleted);
+
+                if (data.message === "Assignment successfully deleted") {
+                    Alert.alert("Success", "Assignment successfully deleted");
+                    await getAllTasks();
+                    return;
+                }
+            }
+            else {
+                parentNavigation.navigate("SignIn");
+                return;
+            }
+        }
+        catch (error: any) {
+            Alert.alert("Error", error?.error);
+        }
+    };
+
+    const cancelDeleteAssignment = () => {
+        closeModal("assignment")
+    };
     
     return (
         <SafeAreaView style={styles.safeContainer}>
@@ -137,6 +213,18 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
                         <Text style={styles.emptyMessage}>No one signed up for this task</Text>
                     )}
                 </ScrollView>
+                <ConfirmModal
+                    visible={isModalVisible["task"]}
+                    message="Are you sure you want to delete this task?"
+                    onConfirm={confirmDeleteTask}
+                    onCancel={cancelDeleteTask}
+                />
+                <ConfirmModal
+                    visible={isModalVisible["assignment"]}
+                    message="Are you sure you want to delete this assignment?"
+                    onConfirm={confirmDeleteAssignment}
+                    onCancel={cancelDeleteAssignment}
+                />
             </View>
         </SafeAreaView>
     )
