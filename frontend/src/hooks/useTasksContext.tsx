@@ -1,6 +1,6 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { getToken } from "../utils/auth_storage";
-import { get_all_tasks } from "../services/task_coordinator_api_services";
+import { get_all_tasks } from "../services/task_api_services";
 
 interface TasksContextType {
     tasks: {

@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Saf
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "../../navigation/types";
 import { getToken, removeToken } from "../../utils/auth_storage";
-import { fetch_user_data } from "../../services/auth_api_services";
+import { fetch_user_data } from "../../services/task_api_services";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { IconButton } from "react-native-paper";
 

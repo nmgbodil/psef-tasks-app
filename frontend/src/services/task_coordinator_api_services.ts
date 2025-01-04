@@ -10,19 +10,6 @@ const apiClient = axios.create({
 });
 
 // Helper functions for API calls
-export const get_all_tasks = async (access_token: string) => {
-    try {
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-        const response = await apiClient.get("tasks/coordinator/all_tasks");
-        return response.data;
-    }
-    catch (error) {
-        const axiosError = error as AxiosError;
-        console.error("Get All Tasks API Error:", axiosError.response?.data || axiosError.message);
-        throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
-    }
-};
-
 export const get_all_users = async (access_token: string) => {
     try {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
