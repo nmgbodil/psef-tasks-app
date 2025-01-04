@@ -3,7 +3,7 @@ from flask import current_app
 from datetime import datetime
 
 from src.models.task_model import Task, TaskStatus
-from src.models.user_model import User, UserRole
+from src.models.user_model import UserRole
 from src.models.assignment_model import Assignment
 from src.dals import task_dal
 from src.dals import user_dal
@@ -165,7 +165,7 @@ def get_all_tasks(user_id: str):
     try:
         # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
-            results['message'] = 'user_unauthorized'
+            results['message'] = 'user unauthorized'
             return results
         
         task_list = task_dal.get_all_tasks()
@@ -218,7 +218,7 @@ def get_all_assignments(user_id):
     try:
         # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
-            results['message'] = 'user_unauthorized'
+            results['message'] = 'user unauthorized'
             return results
         
         assignment_list = assignment_dal.get_all_assignments()
@@ -238,7 +238,7 @@ def get_all_users(user_id):
     try:
         # Access control for coordinators only
         if user_dal.get_user_role(user_id) != UserRole.COORDINATOR:
-            results['message'] = 'user_unauthorized'
+            results['message'] = 'user unauthorized'
             return results
         
         results['user_list'] = user_dal.get_all_users()

@@ -4,7 +4,7 @@ from src.models.assignment_model import Assignment
 def get_assignment_by_id(assignment_id):
     statement = f'''SELECT * FROM assignments WHERE assignment_id = '{assignment_id}';'''
 
-    assignment_id, task_id, user_id, assigned_by = sync_db_util.execute_query_fetchone(statement)
+    assignment_id, task_id, user_id, assigned_by, updated_at = sync_db_util.execute_query_fetchone(statement)
 
     assignment = Assignment(
         assignment_id=assignment_id,
@@ -26,7 +26,7 @@ def get_all_assignments():
     statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.description, a.user_id, a.assigned_by, t.start_time, t.end_time
     FROM assignments a
     INNER JOIN tasks t ON a.task_id = t.task_id
-    Where t.start_time >= CURRENT_TIMESTAMP
+    WHERE t.start_time >= CURRENT_TIMESTAMP
     ORDER BY t.start_time ASC;
     '''
 
@@ -47,6 +47,19 @@ def get_all_assignments():
         assignment_list.append(assignment_obj.dict())
     
     return assignment_list
+
+def get_my_assignments(user_id):
+    statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.task_type, t.description, t.max_participants, t.start_time, t.end_time
+    FROM assignments a
+    INNER JOIN tasks t ON a.task_id = t.task_id
+    WHERE a.user_id = '{user_id}'
+    AND t.start_time >= CURRENT_TIMESTAMP
+    ORDER BY t.start_time ASC;
+    '''
+
+    user_tasks = sync_db_util.execute_query_fetchall(statement)
+
+    return user_tasks
 
 def check_assignment_exists(task_id, user_id):
     statement = f'''SELECT EXISTS(SELECT 1 FROM assignments WHERE task_id = '{task_id}' and user_id = '{user_id}');'''
