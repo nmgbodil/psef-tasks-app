@@ -184,29 +184,6 @@ def update_assignment(assignment_id):
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
-@task_coordinator.get("/all_tasks")
-@jwt_required()
-def get_all_tasks():
-    user_id = get_jwt_identity()
-
-    try:
-        result = task_coordinator_manager.get_all_tasks(user_id)
-        message = result.get('message')
-
-        if message == 'tasks successfully retrieved':
-            task_list = result.get('task_list')
-            sorted_tasks = result.get('sorted_tasks')
-            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': task_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
-        elif message == 'user unauthorized':
-            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
-        else:
-            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
-    
-    except ValidationError as e:
-        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
-    except Exception as e:
-        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
-
 @task_coordinator.get("/all_assignments")
 @jwt_required()
 def get_all_assignments():
