@@ -11,6 +11,7 @@ import SignUpScreen from "./src/screens/SignUpScreen";
 import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import CoordinatorNavigator from './src/navigation/CoordinatorNavigator';
 import { UsersProvider } from './src/hooks/useUsersContext';
+import SearchTaskScreen from './src/screens/SearchTaskScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -42,6 +43,7 @@ const App = () => {
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             <Stack.Screen name="CoordinatorNavigator" component={CoordinatorNavigator} />
+            <Stack.Screen name="SearchTask" component={SearchTaskScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </PaperProvider>

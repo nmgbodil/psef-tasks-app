@@ -9,7 +9,14 @@ export type RootStackParamList = {
     SignUp: undefined;
     ForgotPassword: undefined;
     ResetPassword: { resetToken: string };
+    SearchTask: { title: string };
+    CoordinatorNavigator: {
+        screen: string;
+        params: any;
+    } | undefined;
 };
+
+export type SearchTaskProps = NativeStackScreenProps<RootStackParamList, "SearchTask">;
 
 export type CoordinatorStackParamList = {
     Sidebar: undefined;

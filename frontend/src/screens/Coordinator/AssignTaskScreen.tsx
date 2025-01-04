@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, FlatList, Alert, SafeAreaView } from "react-native";
+import { View, Text, Button, StyleSheet, Alert, SafeAreaView } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { RootStackParamList, AssignTaskProps, UserRole } from "@/src/navigation/types";
+import { RootStackParamList, AssignTaskProps } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { assign_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";

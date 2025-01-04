@@ -105,7 +105,10 @@ const DashboardScreen: React.FC = () => {
         if (label === "Create task") {
             navigation.navigate("CreateTask");
         }
-    }
+        else {
+            parentNavigation.navigate("SearchTask", { title: label })
+        }
+    };
 
     return (
         <SafeAreaView style={styles.safeContainer}>
