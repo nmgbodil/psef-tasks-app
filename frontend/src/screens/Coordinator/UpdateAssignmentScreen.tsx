@@ -10,7 +10,7 @@ import { useUsers } from "@/src/hooks/useUsersContext";
 
 const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) => {
     const { task_id, user_data } = route.params;
-    const { tasks, getAllTasks } = useTasks();
+    const { tasks } = useTasks();
     const { users, getAllUsers } = useUsers();
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
@@ -61,7 +61,6 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
     
                 if (data.message === "Assignment successfully updated") {
                     Alert.alert("Success", "Assignment successfully updated");
-                    await getAllTasks();
                     navigation.goBack();
                 }
             }

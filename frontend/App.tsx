@@ -12,8 +12,9 @@ import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import CoordinatorNavigator from './src/navigation/CoordinatorNavigator';
 import { UsersProvider } from './src/hooks/useUsersContext';
 import SearchTaskScreen from './src/screens/SearchTaskScreen';
+import { RootStackParamList } from './src/navigation/types';
 
-const Stack = createNativeStackNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const linking = {
   prefixes: ["psef-tasks://"],
@@ -43,6 +44,7 @@ const App = () => {
             <Stack.Screen name="SignUp" component={SignUpScreen} />
             <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
             <Stack.Screen name="CoordinatorNavigator" component={CoordinatorNavigator} />
+            {/* <Stack.Screen name="UserNavigator" component={UserNavigator} /> */}
             <Stack.Screen name="SearchTask" component={SearchTaskScreen} />
           </Stack.Navigator>
         </NavigationContainer>

@@ -1,6 +1,6 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import Sidebar from "./CoordinatorSidebar";
+import Sidebar from "../components/CoordinatorSidebar";
 import TaskDetailsScreen from "../screens/Coordinator/TaskDetailsScreen";
 import { CoordinatorStackParamList } from "./types";
 import AssignTaskScreen from "../screens/Coordinator/AssignTaskScreen";

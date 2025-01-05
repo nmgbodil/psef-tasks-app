@@ -10,8 +10,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import Icon from "react-native-vector-icons/MaterialIcons"
 
 const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
-    const { task_id, user_data } = route.params;
-    const { tasks, getAllTasks } = useTasks();
+    const { task_id } = route.params;
+    const { tasks } = useTasks();
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
@@ -95,7 +95,6 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const handleSubmit = async () => {
         try {
             const access_token = await getToken();
-            console.log(max_participants);
             if ((name || type || description || start_time || end_time || max_participants) && access_token && max_participants != 0) {
                 const task_updates: TaskData = {
                     task_id: null,
@@ -110,7 +109,6 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                 const data = await update_task(access_token, task_updates, task_id);
                 if (data.message === "Task successfully updated") {
                     Alert.alert("Success", "Task was successfully updated");
-                    await getAllTasks();
                     navigation.goBack();
                 }
             }

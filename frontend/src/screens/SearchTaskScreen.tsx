@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, StyleSheet, Alert } from "react-native";
-import { CoordinatorStackParamList, SearchTaskProps } from "../navigation/types";
+import { SearchTaskProps } from "../navigation/types";
 import { useTasks } from "../hooks/useTasksContext";
 import { View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
@@ -10,7 +10,7 @@ import { delete_task } from "../services/task_coordinator_api_services";
 
 const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
     const { title } = route.params;
-    const { tasks, getAllTasks } = useTasks();
+    const { tasks } = useTasks();
     const [formatted_tasks, setFormattedTasks] = useState<any>([]);
     const [selected_task, setSelectedTask] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
@@ -32,7 +32,6 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
 
                 if (data.message === "Task successfully deleted") {
                     Alert.alert("Success", "Task successfully deleted");
-                    await getAllTasks();
                     navigation.navigate("CoordinatorNavigator");
                     return;
                 }

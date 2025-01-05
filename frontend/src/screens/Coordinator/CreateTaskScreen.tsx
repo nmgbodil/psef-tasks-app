@@ -4,13 +4,11 @@ import { RootStackParamList, TaskData } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { create_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { useTasks } from "@/src/hooks/useTasksContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons"
 
 const CreateTaskScreen = () => {
-    const { getAllTasks } = useTasks();
     const navigation = useNavigation();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
@@ -90,7 +88,6 @@ const CreateTaskScreen = () => {
     const handleSubmit = async () => {
         try {
             const access_token = await getToken();
-            console.log(max_participants);
             if (name && type && description && start_time && end_time && access_token && max_participants != 0) {
                 const task: TaskData = {
                     task_id: null,
@@ -105,7 +102,6 @@ const CreateTaskScreen = () => {
                 const data = await create_task(access_token, task);
                 if (data.message === "Task successfully created") {
                     Alert.alert("Success", "Task was successfully created");
-                    await getAllTasks();
                     navigation.goBack();
                 }
             }

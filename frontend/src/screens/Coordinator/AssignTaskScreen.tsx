@@ -9,8 +9,8 @@ import { useTasks } from "@/src/hooks/useTasksContext";
 import { useUsers } from "@/src/hooks/useUsersContext";
 
 const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
-    const { task_id, user_data } = route.params;
-    const { tasks, getAllTasks } = useTasks();
+    const { task_id } = route.params;
+    const { tasks } = useTasks();
     const { users, getAllUsers } = useUsers();
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
@@ -63,7 +63,6 @@ const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
     
                 if (data.message === "Assignment has been successfully created") {
                     Alert.alert("Success", "Assignment successfully created");
-                    await getAllTasks();
                     navigation.goBack();
                 }
             }

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, SectionList, ScrollView, SafeAreaView, Alert } from "react-native";
+import React, { useState } from "react";
+import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, ScrollView, SafeAreaView, Alert } from "react-native";
 import {Menu, IconButton } from "react-native-paper";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { RootStackParamList, TaskDetailsProps } from "@/src/navigation/types";
@@ -14,7 +14,7 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const [isModalVisible, setIsModalVisible] = useState<{ [key: string]: boolean }>({"task": false, "assignment": false});
     const [assignment_deleted, setAssignmentDeleted] = useState<string>("0");
     const { task_id } = route.params;
-    const { tasks, getAllTasks } = useTasks();
+    const { tasks } = useTasks();
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
@@ -115,7 +115,6 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
 
                 if (data.message === "Task successfully deleted") {
                     Alert.alert("Success", "Task successfully deleted");
-                    await getAllTasks();
                     navigation.navigate("Sidebar");
                     return;
                 }
@@ -143,7 +142,6 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
 
                 if (data.message === "Assignment successfully deleted") {
                     Alert.alert("Success", "Assignment successfully deleted");
-                    await getAllTasks();
                     return;
                 }
             }
