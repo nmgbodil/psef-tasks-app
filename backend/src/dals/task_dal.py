@@ -1,10 +1,10 @@
 from src.utils.db import sync_db_util
-from src.models.task_model import Task, TaskStatus
+from src.models.task_model import Task
 
 def get_task_by_id(task_id):
     statement = f'''SELECT * FROM tasks WHERE task_id = '{task_id}';'''
 
-    task_id, task_name, task_type, description, start_time, end_time, max_participants, status, created_at, updated_at = sync_db_util.execute_query_fetchone(statement)
+    task_id, task_name, task_type, description, start_time, end_time, max_participants, created_at, updated_at = sync_db_util.execute_query_fetchone(statement)
 
     task = Task(
         task_id=task_id,
@@ -13,8 +13,7 @@ def get_task_by_id(task_id):
         description=description,
         start_time=start_time,
         end_time=end_time,
-        max_participants=max_participants,
-        status=status
+        max_participants=max_participants
     )
 
     return task

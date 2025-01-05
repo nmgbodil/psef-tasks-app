@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, jsonify
 from pydantic import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
@@ -32,16 +32,14 @@ def get_user_data():
 @task.get("/all_tasks")
 @jwt_required()
 def get_all_tasks():
-    user_id = get_jwt_identity()
-
     try:
         result = task_manager.get_all_tasks()
         message = result.get('message')
 
         if message == 'tasks successfully retrieved':
-            task_list = result.get('task_list')
+            tasks = result.get('tasks')
             sorted_tasks = result.get('sorted_tasks')
-            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': task_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
+            return jsonify({'message': 'Tasks successfully retrieved', 'tasks': tasks, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
         elif message == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
         else:
@@ -51,3 +49,9 @@ def get_all_tasks():
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+# @task.get("/my_past_tasks")
+# @jwt_required()
+# def get_my_past_tasks():
+#     try:
+#         result = task_manager.get_my_past_tasks()

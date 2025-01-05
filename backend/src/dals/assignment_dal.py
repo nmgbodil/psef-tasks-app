@@ -4,13 +4,14 @@ from src.models.assignment_model import Assignment
 def get_assignment_by_id(assignment_id):
     statement = f'''SELECT * FROM assignments WHERE assignment_id = '{assignment_id}';'''
 
-    assignment_id, task_id, user_id, assigned_by, updated_at = sync_db_util.execute_query_fetchone(statement)
+    assignment_id, task_id, user_id, assigned_by, updated_at, status = sync_db_util.execute_query_fetchone(statement)
 
     assignment = Assignment(
         assignment_id=assignment_id,
         task_id=task_id,
         user_id=user_id,
-        assigned_by=assigned_by
+        assigned_by=assigned_by,
+        status=status
     )
 
     return assignment
@@ -22,31 +23,31 @@ def get_task_assignment_count(task_id):
 
     return record[0]
 
-def get_all_assignments():
-    statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.description, a.user_id, a.assigned_by, t.start_time, t.end_time
-    FROM assignments a
-    INNER JOIN tasks t ON a.task_id = t.task_id
-    WHERE t.start_time >= CURRENT_TIMESTAMP
-    ORDER BY t.start_time ASC;
-    '''
+# def get_all_assignments():
+#     statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.description, a.user_id, a.assigned_by, t.start_time, t.end_time
+#     FROM assignments a
+#     INNER JOIN tasks t ON a.task_id = t.task_id
+#     WHERE t.start_time >= CURRENT_TIMESTAMP
+#     ORDER BY t.start_time ASC;
+#     '''
 
-    assignments = sync_db_util.execute_query_fetchall(statement)
-    assignment_list = []
+#     assignments = sync_db_util.execute_query_fetchall(statement)
+#     assignment_list = []
 
-    for assignment in assignments:
-        assignment_obj = Assignment(
-            assignment_id=assignment[0],
-            task_id=assignment[1],
-            task_name=assignment[2],
-            description=assignment[3],
-            user_id=assignment[4],
-            assigned_by=assignment[5],
-            start_time=assignment[6],
-            end_time=assignment[7]
-        )
-        assignment_list.append(assignment_obj.dict())
+#     for assignment in assignments:
+#         assignment_obj = Assignment(
+#             assignment_id=assignment[0],
+#             task_id=assignment[1],
+#             task_name=assignment[2],
+#             description=assignment[3],
+#             user_id=assignment[4],
+#             assigned_by=assignment[5],
+#             start_time=assignment[6],
+#             end_time=assignment[7]
+#         )
+#         assignment_list.append(assignment_obj.dict())
     
-    return assignment_list
+#     return assignment_list
 
 def get_my_assignments(user_id):
     statement = f'''SELECT a.assignment_id, a.task_id, t.task_name, t.task_type, t.description, t.max_participants, t.start_time, t.end_time

@@ -2,10 +2,10 @@ from flask import Blueprint, request, jsonify, Response
 from pydantic import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from src.models.task_model import Task
-from src.models.user_model import User
+from src.managers import task_manager
 from src.managers import task_user_manager
 from src.constants.http_status_codes import *
+from src.utils import broadcasts
 
 task_user = Blueprint("task_user", __name__, url_prefix="/api/v1/tasks/user")
 
@@ -26,6 +26,12 @@ def signup_task():
         result = task_user_manager.signup_task(user_id, task_id)
 
         if result == 'assignment successfully created':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Assignment has been successfully created'}), HTTP_201_CREATED
         elif result == 'assignment already exists':
             return jsonify({'error': 'Assignment already exists'}), HTTP_409_CONFLICT
@@ -52,6 +58,12 @@ def drop_task(assignment_id):
         result = task_user_manager.drop_task(user_id, assignment_id)
 
         if result == 'task successfully dropped':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Task successfully dropped'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED

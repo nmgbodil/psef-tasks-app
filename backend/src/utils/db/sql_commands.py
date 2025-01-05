@@ -124,7 +124,27 @@ def create_user_roles_type():
     except Exception as e:
         print(f'Error creating enum type: {e}')
 
+def delete_tasks_task_status():
+    statement = f'''ALTER TABLE tasks DROP COLUMN status;'''
+
+    try:
+        sync_db_util.execute_query_insert(statement)
+        print("Column 'status' in tasks deleted successfully")
+    except Exception as e:
+        print(f'Error deleting status column: {e}')
+
+def add_assignments_status():
+    statement = f'''
+    ALTER TABLE assignments
+    ADD COLUMN status task_status DEFAULT 'Pending' NOT NULL;
+    '''
+
+    try:
+        sync_db_util.execute_query_insert(statement)
+        print("Status column successfully added to assignments table")
+    except Exception as e:
+        print(f'Error adding status column to assignments table: {e}')
+
 if __name__ == "__main__":
-    # create_task_status_type()
-    create_task_table()
-    create_assignment_table()
+    delete_tasks_task_status()
+    add_assignments_status()

@@ -1,5 +1,4 @@
-from src.models.task_model import Task, TaskStatus
-from src.models.user_model import User, UserRole
+from src.models.user_model import UserRole
 from src.models.assignment_model import Assignment
 from src.dals import task_dal
 from src.dals import user_dal
@@ -43,7 +42,6 @@ def drop_task(user_id: str, assignment_id: str):
         if user_dal.get_user_role(user_id) != UserRole.USER:
             return 'user unauthorized'
         
-        print('checkpoint')
         assignment = assignment_dal.get_assignment_by_id(assignment_id)
         if assignment.user_id != user_id:
             return 'user unauthorized'

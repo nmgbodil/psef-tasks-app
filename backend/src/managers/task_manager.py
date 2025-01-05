@@ -1,4 +1,4 @@
-from src.models.task_model import Task, TaskStatus
+from src.models.task_model import Task
 from src.models.user_model import User, UserRole
 from src.dals import task_dal
 from src.dals import user_dal
@@ -41,8 +41,8 @@ def get_all_tasks():
             tasks[task_id]['task_name'] = task[1]
             tasks[task_id]['task_type'] = task[2]
             tasks[task_id]['description'] = task[3]
-            tasks[task_id]['start_time'] = task[4]
-            tasks[task_id]['end_time'] = task[5]
+            tasks[task_id]['start_time'] = task[4].isoformat()
+            tasks[task_id]['end_time'] = task[5].isoformat()
             tasks[task_id]['max_participants'] = task[6]
             tasks[task_id]['users'] = []
 
@@ -57,12 +57,12 @@ def get_all_tasks():
         return tasks, sorted_tasks
     
 
-    results = {'message': None, 'task_list': None, 'sorted_tasks': None}
+    results = {'message': None, 'tasks': None, 'sorted_tasks': None}
 
     try:
         task_list = task_dal.get_all_tasks()
         response = handleAllAssignments(task_list)
-        results['task_list'] = response[0]
+        results['tasks'] = response[0]
         results['sorted_tasks'] = response[1]
         results['message'] = 'tasks successfully retrieved'
         return results
@@ -70,3 +70,6 @@ def get_all_tasks():
     except Exception as e:
         print(f'Error retrieving all tasks: {str(e)}')
         return 'error'
+
+def get_my_past_tasks():
+    results = {'message': None, 'task_list': None,}

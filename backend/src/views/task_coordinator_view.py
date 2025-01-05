@@ -4,8 +4,10 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from src.models.task_model import Task
 from src.models.user_model import User
+from src.managers import task_manager
 from src.managers import task_coordinator_manager
 from src.constants.http_status_codes import *
+from src.utils import broadcasts
 
 task_coordinator = Blueprint("task_coordinator", __name__, url_prefix="/api/v1/tasks/coordinator")
 
@@ -35,6 +37,12 @@ def create_task():
         result = task_coordinator_manager.create_task(user_id, task)
 
         if result == 'task successfully created':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+
             return jsonify({'message': 'Task successfully created'}), HTTP_201_CREATED
         elif result == 'task exists':
             return jsonify({'error': 'Task has already been created'}), HTTP_409_CONFLICT
@@ -68,6 +76,12 @@ def assign_task():
         result = task_coordinator_manager.assign_task(user_id, assignee_id, task_id)
 
         if result == 'assignment successfully created':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+
             return jsonify({'message': 'Assignment has been successfully created'}), HTTP_201_CREATED
         elif result == 'assignment already exists':
             return jsonify({'error': 'Assignment already exists'}), HTTP_409_CONFLICT
@@ -94,6 +108,12 @@ def delete_task(task_id):
         result = task_coordinator_manager.delete_task(user_id, task_id)
 
         if result == 'task successfully deleted':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Task successfully deleted'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
@@ -114,6 +134,12 @@ def delete_assignment(assignment_id):
         result = task_coordinator_manager.delete_assignment(user_id, assignment_id)
 
         if result == 'assignment successfully deleted':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Assignment successfully deleted'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
@@ -142,6 +168,12 @@ def update_task(task_id):
         result = task_coordinator_manager.update_task(user_id, data, task_id)
 
         if result == 'task successfully updated':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Task successfully updated'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
@@ -169,6 +201,12 @@ def update_assignment(assignment_id):
         result = task_coordinator_manager.update_assignment(user_id, assignee_id, assignment_id)
 
         if result == 'assignment successfully updated':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks()
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+            
             return jsonify({'message': 'Assignment successfully updated'}), HTTP_200_OK
         elif result == 'assignment already exists':
             return jsonify({'error': 'Assignment already exists'}), HTTP_409_CONFLICT
@@ -184,28 +222,28 @@ def update_assignment(assignment_id):
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
-@task_coordinator.get("/all_assignments")
-@jwt_required()
-def get_all_assignments():
-    user_id = get_jwt_identity()
+# @task_coordinator.get("/all_assignments")
+# @jwt_required()
+# def get_all_assignments():
+#     user_id = get_jwt_identity()
 
-    try:
-        result = task_coordinator_manager.get_all_assignments(user_id)
-        message = result.get('message')
+#     try:
+#         result = task_coordinator_manager.get_all_assignments(user_id)
+#         message = result.get('message')
 
-        if message == 'assignments successfully retrieved':
-            assignment_list = result.get('assignment_list')
-            sorted_tasks = result.get('sorted_tasks')
-            return jsonify({'message': 'Assignments successfully retrieved', 'assignments': assignment_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
-        elif message == 'user unauthorized':
-            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
-        else:
-            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+#         if message == 'assignments successfully retrieved':
+#             assignment_list = result.get('assignment_list')
+#             sorted_tasks = result.get('sorted_tasks')
+#             return jsonify({'message': 'Assignments successfully retrieved', 'assignments': assignment_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
+#         elif message == 'user unauthorized':
+#             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+#         else:
+#             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
-    except ValidationError as e:
-        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
-    except Exception as e:
-        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+#     except ValidationError as e:
+#         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+#     except Exception as e:
+#         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
 @task_coordinator.get("/all_users")
 @jwt_required()
