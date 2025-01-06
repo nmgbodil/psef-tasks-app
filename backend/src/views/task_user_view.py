@@ -1,9 +1,8 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from src.managers import task_manager
-from src.managers import task_user_manager
+from src.managers import task_manager, task_user_manager
 from src.constants.http_status_codes import *
 from src.utils import broadcasts
 

@@ -1,8 +1,7 @@
 from src.models.user_model import UserRole
 from src.models.assignment_model import Assignment
-from src.dals import task_dal
-from src.dals import user_dal
-from src.dals import assignment_dal
+from src.dals import task_dal, user_dal, assignment_dal
+from src.utils import format_response
 
 def signup_task(user_id: str, task_id: str):
     try:
@@ -42,6 +41,7 @@ def drop_task(user_id: str, assignment_id: str):
         if user_dal.get_user_role(user_id) != UserRole.USER:
             return 'user unauthorized'
         
+        # Ensure assignment is assigned to user
         assignment = assignment_dal.get_assignment_by_id(assignment_id)
         if assignment.user_id != user_id:
             return 'user unauthorized'
@@ -54,24 +54,6 @@ def drop_task(user_id: str, assignment_id: str):
         return 'error'
     
 def get_my_tasks(user_id: str):
-    def handleTasks(task_list):
-        formatted_task_list = []
-
-        for task in task_list:
-            formatted_task = {}
-            formatted_task['assignment_id'] = task[0]
-            formatted_task['task_id'] = task[1]
-            formatted_task['task_name'] = task[2]
-            formatted_task['task_type'] = task[3]
-            formatted_task['description'] = task[4]
-            formatted_task['max_participants'] = task[5]
-            formatted_task['start_time'] = task[6]
-            formatted_task['end_time'] = task[7]
-
-            formatted_task_list.append(formatted_task)
-        
-        return formatted_task_list
-
     results = {'message': None, 'task_list': None}
 
     try:
@@ -81,7 +63,7 @@ def get_my_tasks(user_id: str):
             return results
         
         task_list = assignment_dal.get_my_assignments(user_id)
-        results['task_list'] = handleTasks(task_list)
+        results['task_list'] = format_response.handleMyTasks(task_list)
         results['message'] = 'user tasks successfully retrieved'
         return results
     

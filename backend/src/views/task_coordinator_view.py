@@ -1,11 +1,9 @@
-from flask import Blueprint, request, jsonify, Response
+from flask import Blueprint, request, jsonify
 from pydantic import ValidationError
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from src.models.task_model import Task
-from src.models.user_model import User
-from src.managers import task_manager
-from src.managers import task_coordinator_manager
+from src.managers import task_manager, task_coordinator_manager
 from src.constants.http_status_codes import *
 from src.utils import broadcasts
 
@@ -221,29 +219,6 @@ def update_assignment(assignment_id):
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
-
-# @task_coordinator.get("/all_assignments")
-# @jwt_required()
-# def get_all_assignments():
-#     user_id = get_jwt_identity()
-
-#     try:
-#         result = task_coordinator_manager.get_all_assignments(user_id)
-#         message = result.get('message')
-
-#         if message == 'assignments successfully retrieved':
-#             assignment_list = result.get('assignment_list')
-#             sorted_tasks = result.get('sorted_tasks')
-#             return jsonify({'message': 'Assignments successfully retrieved', 'assignments': assignment_list, 'sorted_tasks': sorted_tasks}), HTTP_200_OK
-#         elif message == 'user unauthorized':
-#             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
-#         else:
-#             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
-    
-#     except ValidationError as e:
-#         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
-#     except Exception as e:
-#         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
 
 @task_coordinator.get("/all_users")
 @jwt_required()

@@ -1,7 +1,8 @@
-from src.models.task_model import Task
-from src.models.user_model import User, UserRole
-from src.dals import task_dal
-from src.dals import user_dal
+from datetime import datetime
+
+from src.models.assignment_model import Status
+from src.dals import task_dal, user_dal, assignment_dal
+from src.utils import format_response
 
 def get_user_data(user_id):
     results = {'message': None, 'user_data': None}
@@ -21,47 +22,11 @@ def get_user_data(user_id):
         return 'error'
 
 def get_all_tasks():
-    def handleUserData(user_id, assignment_id):
-        user = user_dal.get_user_by_id(user_id)
-        user_data = {
-            'user_id': user.user_id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'assignment_id': assignment_id
-        }
-        return user_data
-
-    def handleAllAssignments(task_list):
-        tasks = {}
-        sorted_tasks = []
-
-        for task in task_list:
-            task_id = task[0]
-            tasks[task_id] = {}
-            tasks[task_id]['task_name'] = task[1]
-            tasks[task_id]['task_type'] = task[2]
-            tasks[task_id]['description'] = task[3]
-            tasks[task_id]['start_time'] = task[4].isoformat()
-            tasks[task_id]['end_time'] = task[5].isoformat()
-            tasks[task_id]['max_participants'] = task[6]
-            tasks[task_id]['users'] = []
-
-            sorted_tasks.append(task_id)
-
-            if task[7]:
-                pairs = task[7].split(',')
-                for pair in pairs:
-                    user_id, assignment_id = pair.split(':')
-                    tasks[task_id]['users'].append(handleUserData(user_id, assignment_id))
-        
-        return tasks, sorted_tasks
-    
-
     results = {'message': None, 'tasks': None, 'sorted_tasks': None}
 
     try:
         task_list = task_dal.get_all_tasks()
-        response = handleAllAssignments(task_list)
+        response = format_response.handleAllAssignments(task_list)
         results['tasks'] = response[0]
         results['sorted_tasks'] = response[1]
         results['message'] = 'tasks successfully retrieved'
@@ -71,5 +36,36 @@ def get_all_tasks():
         print(f'Error retrieving all tasks: {str(e)}')
         return 'error'
 
-def get_my_past_tasks():
-    results = {'message': None, 'task_list': None,}
+def get_my_pending_tasks(user_id):
+    results = {'message': None, 'task_list': None}
+
+    try:
+        task_list = assignment_dal.get_my_pending_assignments(user_id)
+        results['task_list'] = format_response.handleMyTasks(task_list)
+        results['message'] = 'pending user tasks successfully retrieved'
+        return results
+
+    except Exception as e:
+        print(f'Error retrieving pending user tasks: {str(e)}')
+        return 'error'
+    
+def update_status(user_id, status, assignment_id):
+    try:
+        # Ensure assignment is assigned to user
+        assignment = assignment_dal.get_assignment_by_id(assignment_id)
+        if assignment.user_id != user_id:
+            return 'user unauthorized'
+
+        if assignment.status != Status.PENDING:
+            return 'task not pending'
+        
+        task_details = task_dal.get_task_by_id(assignment.task_id)
+        if task_details.end_time >= datetime.now():
+            return 'task not over'
+
+        assignment_dal.update_status(assignment_id, status)
+        return 'task status successfully updated'
+
+    except Exception as e:
+        print(f'Error updating task status: {str(e)}')
+        return 'error'   
