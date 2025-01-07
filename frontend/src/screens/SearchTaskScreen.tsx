@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, SafeAreaView, Text, StyleSheet, Alert } from "react-native";
-import { SearchTaskProps } from "../navigation/types";
+import { SearchTaskProps } from "../utils/types";
 import { useTasks } from "../hooks/useTasksContext";
 import { View } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRoute, RouteProp, useNavigation, NavigationProp } from "@react-navigation/native";
 import { reset_password } from "../services/auth_api_services";
-import { RootStackParamList } from "../navigation/types";
+import { RootStackParamList } from "../navigation/RootStackParamList";
 
 const ResetPasswordScreen: React.FC = () => {
     const route = useRoute<RouteProp<RootStackParamList, "ResetPassword">>();

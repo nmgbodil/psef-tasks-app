@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "reac
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { saveToken } from "../utils/auth_storage";
 import { login } from "../services/auth_api_services";
-import { RootStackParamList } from "../navigation/types";
+import { RootStackParamList } from "../navigation/RootStackParamList";
 
 const SignInScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert} from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { register } from "../services/auth_api_services";
-import { RootStackParamList, UserData } from "../navigation/types";
+import { UserData } from "../utils/types";
+import { RootStackParamList } from "../navigation/RootStackParamList";
 
 const SignUpScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();

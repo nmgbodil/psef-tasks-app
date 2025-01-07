@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, SafeAreaView } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
-import { RootStackParamList, AssignTaskProps } from "@/src/navigation/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { assign_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { useUsers } from "@/src/hooks/useUsersContext";
+import { AssignTaskProps } from "@/src/navigation/CoordinatorStackParamList";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 
 const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
     const { task_id } = route.params;
@@ -31,7 +32,7 @@ const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
         };
 
         fetchUsers();
-    }, [users, getAllUsers]);
+    }, []);
 
     const handleError = (error: any) => {
         if (error.error) {

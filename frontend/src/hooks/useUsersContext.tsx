@@ -1,7 +1,7 @@
 import React, { createContext, ReactNode, useContext, useState } from "react";
 import { getToken } from "../utils/auth_storage";
 import { get_all_users } from "../services/task_coordinator_api_services";
-import { UserData, UserRole } from "../navigation/types";
+import { UserData, UserRole } from "../utils/types";
 
 interface UsersContextType {
     users: {

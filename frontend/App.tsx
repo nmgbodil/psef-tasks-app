@@ -12,7 +12,7 @@ import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import CoordinatorNavigator from './src/navigation/CoordinatorNavigator';
 import { UsersProvider } from './src/hooks/useUsersContext';
 import SearchTaskScreen from './src/screens/SearchTaskScreen';
-import { RootStackParamList } from './src/navigation/types';
+import { RootStackParamList } from './src/navigation/RootStackParamList';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

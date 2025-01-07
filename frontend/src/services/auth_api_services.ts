@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { UserData } from "../navigation/types";
+import { UserData } from "../utils/types";
 import { API_BASE_URL } from "../constants/api_constants";
 
 // Axios instance with default configuration

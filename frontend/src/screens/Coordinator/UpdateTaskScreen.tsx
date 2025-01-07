@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from "react-native";
-import { RootStackParamList, TaskData, UpdateTaskProps } from "@/src/navigation/types";
+import { TaskData } from "@/src/utils/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { update_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";
@@ -8,6 +8,8 @@ import { useTasks } from "@/src/hooks/useTasksContext";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons"
+import { UpdateTaskProps } from "@/src/navigation/CoordinatorStackParamList";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 
 const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const { task_id } = route.params;

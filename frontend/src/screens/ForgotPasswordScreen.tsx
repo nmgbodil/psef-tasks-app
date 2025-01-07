@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { forgot_password } from "../services/auth_api_services";
-import { RootStackParamList } from "../navigation/types";
+import { RootStackParamList } from "../navigation/RootStackParamList";
 
 const ForgotPasswordScreen: React.FC = () => {
-    const navigation = useNavigation();
-    const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
+    const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [email, setEmail] = useState<string>("");
 
     const handleForgotPassword = async () => {
@@ -59,7 +58,7 @@ const ForgotPasswordScreen: React.FC = () => {
                 <Text style={styles.buttonText}>Send Password Reset Email</Text>
             </TouchableOpacity>
             <View style={styles.login_row}>
-                <TouchableOpacity onPress={() => parentNavigation.navigate("SignIn")}>
+                <TouchableOpacity onPress={() => navigation.navigate("SignIn")}>
                     <Text style={styles.link}>Log in</Text>
                 </TouchableOpacity>
             </View>

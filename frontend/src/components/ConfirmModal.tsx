@@ -1,6 +1,12 @@
 import React from "react";
 import { Modal, StyleSheet, View, Text, Button } from "react-native";
-import { ConfirmModalProps } from "../navigation/types";
+
+type ConfirmModalProps = {
+    visible: boolean;
+    message: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+};
 
 const ConfirmModal = ({ visible, message, onConfirm, onCancel }: ConfirmModalProps) => {
     return (

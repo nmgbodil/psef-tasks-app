@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../navigation/types";
+import { RootStackParamList } from "../navigation/RootStackParamList";
+import { CoordinatorStackParamList } from "../navigation/CoordinatorStackParamList";
 
 const ProfileScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     return (

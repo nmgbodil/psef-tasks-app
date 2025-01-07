@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, ScrollView, SafeAreaView, Alert } from "react-native";
 import {Menu, IconButton } from "react-native-paper";
 import { useTasks } from "@/src/hooks/useTasksContext";
-import { RootStackParamList, TaskDetailsProps } from "@/src/navigation/types";
 import ConfirmModal from "@/src/components/ConfirmModal";
 import { getToken } from "@/src/utils/auth_storage";
 import { delete_assignment, delete_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp } from "@react-navigation/native";
+import { TaskDetailsProps } from "@/src/navigation/CoordinatorStackParamList";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 
 const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const [userVisibleMenus, setUserVisibleMenus] = useState<{ [key: string]: boolean }>({});

@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from "react-native";
-import { RootStackParamList, TaskData } from "@/src/navigation/types";
+import {  TaskData } from "@/src/utils/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { create_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import Icon from "react-native-vector-icons/MaterialIcons"
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
 
 const CreateTaskScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     const [name, setName] = useState<string>("");

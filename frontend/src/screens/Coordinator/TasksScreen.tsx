@@ -1,10 +1,11 @@
 import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "@/src/navigation/types";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
 
 const TasksScreen: React.FC = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     return (

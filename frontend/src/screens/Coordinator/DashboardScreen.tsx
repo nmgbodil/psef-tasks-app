@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { RootStackParamList } from "../../navigation/types";
 import { getToken, removeToken } from "../../utils/auth_storage";
-import { fetch_user_data } from "../../services/task_api_services";
+import { fetch_user_data, get_my_pending_tasks } from "../../services/task_api_services";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { IconButton } from "react-native-paper";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import ConfirmStatus from "@/src/components/ConfirmStatus";
+import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
 
 const DashboardScreen: React.FC = () => {
     const [userData, setUserData] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const { tasks, getAllTasks } = useTasks();
-    const navigation = useNavigation();
+    const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     useEffect(() => {
@@ -23,9 +25,9 @@ const DashboardScreen: React.FC = () => {
     }, []);
 
     const quickActions = [
-        {label: "Create task", icon: "plus-circle", navigation: ""},
-        {label: "Assign task", icon: "account", navigation: ""},
-        {label: "Delete task", icon: "delete", navigation: ""},
+        {label: "Create task", icon: "plus-circle"},
+        {label: "Assign task", icon: "account"},
+        {label: "Delete task", icon: "delete"},
     ];
 
     const fetchUserData = async () => {
@@ -114,8 +116,9 @@ const DashboardScreen: React.FC = () => {
         <SafeAreaView style={styles.safeContainer}>
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
-                <View style={styles.task_container}>
-                    <Text style={styles.subtitle}>Upcoming Tasks</Text>
+                <ConfirmStatus />
+                <View style={styles.subContainer}>
+                    <Text style={styles.subTitle}>Upcoming Tasks</Text>
                     {tasks?.sorted_tasks?.map((task_id: any) => (
                         <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
                             <Text>{tasks?.tasks[task_id.toString()]?.task_name}</Text>
@@ -131,7 +134,7 @@ const DashboardScreen: React.FC = () => {
                     <Text style={styles.link}>Log out</Text>
                 </TouchableOpacity>
                 <View style={styles.actionsContainer}>
-                    <Text style={styles.subtitle}>Quick Actions</Text>
+                    <Text style={styles.subTitle}>Quick Actions</Text>
                     {quickActions.map((item, index) => (
                             <TouchableOpacity key={index} style={styles.action} onPress={() => {handleQuickActionPress(item.label)}}>
                                 <Text style={styles.actionText}>{item?.label}</Text>
@@ -160,15 +163,33 @@ const styles = StyleSheet.create({
         color: "#f0b44a",
         textAlign: "center",
     },
+    pendingContainer: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        backgroundColor: "#f8f8f8",
+        padding: 20,
+        borderRadius: 15,
+        width: "100%",
+        overflow: "hidden",
+        elevation: 2,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        marginTop: 20
+    },
+    textBox: {
+
+    },
     text: {
         fontSize: 25,
         fontWeight: "600",
     },
-    subtitle: {
+    subTitle: {
         fontSize: 25,
         fontWeight: "600"
     },
-    task_container: {
+    subContainer: {
 
     },
     task: {

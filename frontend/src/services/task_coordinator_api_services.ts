@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios";
-import { TaskData } from "../navigation/types";
+import { TaskData } from "../utils/types";
 import { API_BASE_URL } from "../constants/api_constants";
 
 const apiClient = axios.create({
