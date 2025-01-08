@@ -12,11 +12,11 @@ interface UsersContextType {
         role: UserRole;
     }[];
     getAllUsers: () => Promise<void>;
-}
+};
 
 interface UsersProviderProps {
     children: ReactNode;
-}
+};
 
 const UsersContext = createContext<UsersContextType | undefined>(undefined);
 

@@ -13,7 +13,7 @@ const apiClient = axios.create({
 export const fetch_user_data = async (access_token: string) => {
     try {
         apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
-        const response = await apiClient.get("tasks/user");
+        const response = await apiClient.get("tasks/my_user");
         return response.data;
     }
     catch (error) {
@@ -57,7 +57,7 @@ export const update_status = async (access_token: string, assignment_id: string,
     }
     catch (error) {
         const axiosError = error as AxiosError;
-        console.error("Get Update Task Status API Error:", axiosError.response?.data || axiosError.message);
+        console.error("Update Task Status API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };

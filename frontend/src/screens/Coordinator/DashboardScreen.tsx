@@ -1,18 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { getToken, removeToken } from "../../utils/auth_storage";
-import { fetch_user_data, get_my_pending_tasks } from "../../services/task_api_services";
-import { useTasks } from "@/src/hooks/useTasksContext";
 import { IconButton } from "react-native-paper";
+
+import { removeToken } from "../../utils/auth_storage";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 import ConfirmStatus from "@/src/components/ConfirmStatus";
 import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
+import { useUserData } from "@/src/hooks/useUserDataContext";
+import { useTasks } from "@/src/hooks/useTasksContext";
 
 const DashboardScreen: React.FC = () => {
-    const [userData, setUserData] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
     const { tasks, getAllTasks } = useTasks();
+    const { userData, loading } = useUserData();
     const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
@@ -29,61 +29,6 @@ const DashboardScreen: React.FC = () => {
         {label: "Assign task", icon: "account"},
         {label: "Delete task", icon: "delete"},
     ];
-
-    const fetchUserData = async () => {
-        try {
-            const access_token = await getToken();
-            if (access_token) {
-                const data = await fetch_user_data(access_token);
-
-                if (data.message === "User data successfully retrieved") {
-                    return data;
-                }
-            }
-            else {
-                parentNavigation.navigate("SignIn");
-                return null;
-            }
-        }
-        catch (error: any) {
-            handleError(error);
-        }
-    };
-
-    const handleError = (error: any) => {
-        if (error.error) {
-            switch (error.error) {
-                case "This user does not exist":
-                    Alert.alert("Error", "This account does not exist");
-                    break;
-                case "Unauthorized":
-                    Alert.alert("Error", "This account is unauthorized for this action");
-                    break;
-                default:
-                    Alert.alert("Error", error.error);
-                    break;
-            }
-        }
-    };
-
-    useEffect(() => {
-        const fetchAndSetData = async () => {
-            try {
-                const data = await fetchUserData();
-                if (data) {
-                    setUserData(data);
-                }
-            }
-            catch (error) {
-                console.error("Error fetching data:", error);
-            }
-            finally {
-                setLoading(false);
-            }
-        };
-
-        fetchAndSetData();
-    }, []);
 
     if (loading) {
         return <ActivityIndicator size="large" color="#f0a827"/>;
@@ -114,6 +59,7 @@ const DashboardScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.safeContainer}>
+            <StatusBar hidden={false} />
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
                 <ConfirmStatus />
@@ -150,11 +96,12 @@ const DashboardScreen: React.FC = () => {
 const styles = StyleSheet.create({
     safeContainer: {
         flex: 1,
-        backgroundColor: "#ffffff"
+        backgroundColor: "#ffffff",
+        paddingTop: 16
     },
     container: {
         flex: 1,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: "#ffffff",
         padding: 16,
     },
     title: {

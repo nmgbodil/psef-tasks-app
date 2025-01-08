@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Sidebar from "../components/CoordinatorSidebar";
 import TaskDetailsScreen from "../screens/Coordinator/TaskDetailsScreen";
@@ -7,10 +7,21 @@ import UpdateTaskScreen from "../screens/Coordinator/UpdateTaskScreen";
 import UpdateAssignmentScreen from "../screens/Coordinator/UpdateAssignmentScreen";
 import CreateTaskScreen from "../screens/Coordinator/CreateTaskScreen";
 import { CoordinatorStackParamList } from "./CoordinatorStackParamList";
+import { useUserData } from "../hooks/useUserDataContext";
 
 const Stack = createNativeStackNavigator<CoordinatorStackParamList>();
 
 const CoordinatorNavigator = () => {
+    const { getUserData } = useUserData();
+
+    useEffect(() => {
+        const fetchData = async () => {
+            await getUserData();
+        };
+
+        fetchData();
+    }, []);
+    
     return (
         <Stack.Navigator
         initialRouteName="Sidebar"
