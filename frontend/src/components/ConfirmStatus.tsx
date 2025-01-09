@@ -79,7 +79,7 @@ const ConfirmStatus = () => {
     return (
         <View>
             {pending_tasks?.pending_tasks?.length > 0 && (
-                <View>
+                <View style={styles.container}>
                     <Text style={styles.subTitle}>Did you do this recent task?</Text>
                     <View style={styles.pendingContainer}>
                         <View style={styles.textBox}>
@@ -101,6 +101,9 @@ const ConfirmStatus = () => {
 };
 
 const styles = StyleSheet.create({
+    container: {
+        marginTop: 15,
+    },
     pendingContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -114,7 +117,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
         shadowRadius: 4,
-        marginTop: 20
     },
     subTitle: {
         fontSize: 25,

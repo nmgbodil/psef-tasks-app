@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
-import { IconButton } from "react-native-paper";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { removeToken } from "../../utils/auth_storage";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
@@ -11,8 +11,8 @@ import { useUserData } from "@/src/hooks/useUserDataContext";
 import { useTasks } from "@/src/hooks/useTasksContext";
 
 const DashboardScreen: React.FC = () => {
-    const { tasks, getAllTasks } = useTasks();
-    const { userData, loading } = useUserData();
+    const { tasks, getAllTasks, loading } = useTasks();
+    const { userData } = useUserData();
     const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
@@ -23,10 +23,11 @@ const DashboardScreen: React.FC = () => {
 
         fetchTasks();
     }, []);
+    console.log("Coordinator")
 
     const quickActions = [
-        {label: "Create task", icon: "plus-circle"},
-        {label: "Assign task", icon: "account"},
+        {label: "Create task", icon: "add-circle"},
+        {label: "Assign task", icon: "assignment-ind"},
         {label: "Delete task", icon: "delete"},
     ];
 
@@ -53,7 +54,7 @@ const DashboardScreen: React.FC = () => {
             navigation.navigate("CreateTask");
         }
         else {
-            parentNavigation.navigate("SearchTask", { title: label })
+            navigation.navigate("SearchTask", { title: label })
         }
     };
 
@@ -84,7 +85,7 @@ const DashboardScreen: React.FC = () => {
                     {quickActions.map((item, index) => (
                             <TouchableOpacity key={index} style={styles.action} onPress={() => {handleQuickActionPress(item.label)}}>
                                 <Text style={styles.actionText}>{item?.label}</Text>
-                                <IconButton icon={item.icon} size={25} iconColor="black" />
+                                <MaterialIcons name={item.icon} size={25} color="black" />
                             </TouchableOpacity>
                     ))}
                 </View>

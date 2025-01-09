@@ -26,17 +26,19 @@ interface TasksContextType {
         };
     };
     getAllTasks: () => Promise<void>;
-}
+    loading: boolean;
+};
 
 interface TasksProviderProps {
     children: ReactNode;
-}
+};
 
 const TasksContext = createContext<TasksContextType | undefined>(undefined);
 
 export const TasksProvider: React.FC<TasksProviderProps> = ({ children }: any) => {
     const [tasks, setTasks] = useState<any>({});
     const [socket, setSocket] = useState<Socket | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
 
     const getAllTasks = async () => {
         try {
@@ -50,7 +52,10 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({ children }: any) =
             }
         }
         catch (error) {
-            console.error("Error fetching tasks:", error)
+            console.error("Error fetching tasks:", error);
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -81,7 +86,7 @@ export const TasksProvider: React.FC<TasksProviderProps> = ({ children }: any) =
     }, [socket])
 
     return (
-        <TasksContext.Provider value={{ tasks, getAllTasks }}>
+        <TasksContext.Provider value={{ tasks, getAllTasks, loading }}>
             {children}
         </TasksContext.Provider>
     );

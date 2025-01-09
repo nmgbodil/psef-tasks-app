@@ -4,11 +4,15 @@ import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { saveToken } from "../utils/auth_storage";
 import { login } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/RootStackParamList";
+import { useUserData } from "../hooks/useUserDataContext";
+import { UserRole } from "../utils/types";
+import { fetch_user_data } from "../services/task_api_services";
 
 const SignInScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const { getUserData } = useUserData();
 
     const handleSignIn = async () => {
         if (!email || !password) {
@@ -22,7 +26,13 @@ const SignInScreen: React.FC = () => {
             if (data.message === "Welcome to your profile") {
                 const access_token = data.access_token;
                 await saveToken(access_token);
-                navigation.replace("CoordinatorNavigator");
+                const userData = await fetch_user_data(access_token);
+                if (userData?.user?.role === UserRole.Coordinator) {
+                    navigation.replace("CoordinatorNavigator");
+                } else {
+                    navigation.replace("UserNavigator");
+                }
+                await getUserData();
             }
         }
         catch (error: any) {

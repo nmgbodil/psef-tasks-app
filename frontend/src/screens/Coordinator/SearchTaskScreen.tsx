@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Button, SafeAreaView, Text, StyleSheet, Alert } from "react-native";
-import { SearchTaskProps } from "../utils/types";
-import { useTasks } from "../hooks/useTasksContext";
-import { View } from "react-native";
+import { View, Button, SafeAreaView, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
+
 import DropDownPicker from "react-native-dropdown-picker";
-import ConfirmModal from "../components/ConfirmModal";
-import { getToken } from "../utils/auth_storage";
-import { delete_task } from "../services/task_coordinator_api_services";
+import ConfirmModal from "../../components/ConfirmModal";
+import { getToken } from "../../utils/auth_storage";
+import { delete_task } from "../../services/task_coordinator_api_services";
+import { SearchTaskProps } from "../../navigation/CoordinatorStackParamList";
+import { useTasks } from "../../hooks/useTasksContext";
+import { NavigationProp } from "@react-navigation/native";
+import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 
 const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
     const { title } = route.params;
@@ -15,6 +17,7 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
     const [selected_task, setSelectedTask] = useState<string | null>(null);
     const [open, setOpen] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState<{ [key: string]: boolean }>({"task": false});
+    const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     const openModal = (adj: string) => {
         setIsModalVisible((prev) => ({ ...prev, [adj]: true}));
@@ -32,12 +35,12 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
 
                 if (data.message === "Task successfully deleted") {
                     Alert.alert("Success", "Task successfully deleted");
-                    navigation.navigate("CoordinatorNavigator");
+                    navigation.goBack();
                     return;
                 }
             }
             else {
-                navigation.navigate("SignIn");
+                parentNavigation.navigate("SignIn");
                 return;
             }
         }
@@ -66,16 +69,22 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
         format_tasks();
     }, [tasks]);
 
+    const handleTaskDetailsPress = () => {
+        if (selected_task) {
+            navigation.navigate("TaskDetails", { task_id: selected_task })
+        }
+        else {
+            Alert.alert("", "Please select a task first");
+        }
+    };
+
     const handleSubmit = () => {
         if (selected_task) {
             if (title === "Delete task") {
                 openModal("task");
             }
             else {
-                navigation.navigate("CoordinatorNavigator", {
-                    screen: "AssignTask",
-                    params: { task_id: selected_task, user_data: null}
-                });
+                navigation.navigate("AssignTask", { task_id: selected_task, user_data: null });
             }
         }
         else {
@@ -110,6 +119,9 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
                         searchContainerStyle={styles.searchContainer}
                     />
                 </View>
+                <TouchableOpacity style={styles.button} onPress={handleTaskDetailsPress}>
+                    <Text style={styles.buttonText}>See task details</Text>
+                </TouchableOpacity>
                 <ConfirmModal
                     visible={isModalVisible["task"]}
                     message="Are you sure you want to delete this task?"
@@ -172,7 +184,21 @@ const styles = StyleSheet.create({
     searchContainer: {
         borderBottomColor: "#ccc",
         borderBottomWidth: 1,
-    }
+    },
+    button: {
+        width: "30%",
+        backgroundColor: "#CFB53B",
+        paddingVertical: 12,
+        borderRadius: 20,
+        alignItems: "center",
+        marginTop: 12,
+        alignSelf: "center"
+    },
+    buttonText: {
+        fontSize: 12,
+        fontWeight: "bold",
+        color: "#FFFFFF",
+    },
 });
 
 export default SearchTaskScreen;

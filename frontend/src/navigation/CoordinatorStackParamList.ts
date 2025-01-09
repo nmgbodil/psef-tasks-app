@@ -31,9 +31,11 @@ export type CoordinatorStackParamList = {
         } | null;
     };
     CreateTask: undefined;
+    SearchTask: { title: string };
 };
 
 export type TaskDetailsProps = NativeStackScreenProps<CoordinatorStackParamList, "TaskDetails">;
 export type AssignTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "AssignTask">;
 export type UpdateTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "UpdateTask">;
 export type UpdateAssignmentProps = NativeStackScreenProps<CoordinatorStackParamList, "UpdateAssignment">;
+export type SearchTaskProps = NativeStackScreenProps<CoordinatorStackParamList, "SearchTask">;

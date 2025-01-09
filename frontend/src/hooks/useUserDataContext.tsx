@@ -16,7 +16,6 @@ interface UserDataContextType {
         };
     };
     getUserData: () => Promise<void>;
-    loading: boolean;
 };
 
 interface UserDataProviderProps {
@@ -27,7 +26,6 @@ const UserDataContext = createContext<UserDataContextType | undefined>(undefined
 
 export const UserDataProvider: React.FC<UserDataProviderProps> = ({ children }: any) => {
     const [userData, setUserData] = useState<any>({});
-    const [loading, setLoading] = useState<boolean>(true);
 
     const getUserData = async () => {
         try {
@@ -43,13 +41,10 @@ export const UserDataProvider: React.FC<UserDataProviderProps> = ({ children }: 
         catch (error) {
             console.error("Error fetching user data:", error);
         }
-        finally {
-            setLoading(false)
-        }
     };
 
     return (
-        <UserDataContext.Provider value={{ userData, getUserData, loading }}>
+        <UserDataContext.Provider value={{ userData, getUserData }}>
             {children}
         </UserDataContext.Provider>
     );

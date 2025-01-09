@@ -1,5 +1,6 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+
 import Sidebar from "../components/CoordinatorSidebar";
 import TaskDetailsScreen from "../screens/Coordinator/TaskDetailsScreen";
 import AssignTaskScreen from "../screens/Coordinator/AssignTaskScreen";
@@ -7,21 +8,11 @@ import UpdateTaskScreen from "../screens/Coordinator/UpdateTaskScreen";
 import UpdateAssignmentScreen from "../screens/Coordinator/UpdateAssignmentScreen";
 import CreateTaskScreen from "../screens/Coordinator/CreateTaskScreen";
 import { CoordinatorStackParamList } from "./CoordinatorStackParamList";
-import { useUserData } from "../hooks/useUserDataContext";
+import SearchTaskScreen from "../screens/Coordinator/SearchTaskScreen";
 
 const Stack = createNativeStackNavigator<CoordinatorStackParamList>();
 
 const CoordinatorNavigator = () => {
-    const { getUserData } = useUserData();
-
-    useEffect(() => {
-        const fetchData = async () => {
-            await getUserData();
-        };
-
-        fetchData();
-    }, []);
-    
     return (
         <Stack.Navigator
         initialRouteName="Sidebar"
@@ -33,6 +24,7 @@ const CoordinatorNavigator = () => {
             <Stack.Screen name="UpdateTask" component={UpdateTaskScreen} options={{ title: "Update Task" }} />
             <Stack.Screen name="UpdateAssignment" component={UpdateAssignmentScreen} options={{ title: "Update Assignment" }} />
             <Stack.Screen name="CreateTask" component={CreateTaskScreen} options={{ title: "Create Task" }} />
+            <Stack.Screen name="SearchTask" component={SearchTaskScreen} />
         </Stack.Navigator>
     );
 };

@@ -11,9 +11,11 @@ import SignUpScreen from "./src/screens/SignUpScreen";
 import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import CoordinatorNavigator from './src/navigation/CoordinatorNavigator';
 import { UsersProvider } from './src/hooks/useUsersContext';
-import SearchTaskScreen from './src/screens/SearchTaskScreen';
+import SearchTaskScreen from './src/screens/Coordinator/SearchTaskScreen';
 import { RootStackParamList } from './src/navigation/RootStackParamList';
 import { UserDataProvider } from './src/hooks/useUserDataContext';
+import { UserTasksProvider } from './src/hooks/useUserTasksContext';
+import UserNavigator from './src/navigation/UserNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -33,25 +35,26 @@ const App = () => {
   return (
     <TasksProvider>
       <UsersProvider>
-        <UserDataProvider>
-          <PaperProvider>
-            <NavigationContainer linking={linking}>
-              {/* Stack Navigator to manage screens */}
-              <Stack.Navigator
-                initialRouteName="Splash" // Start with the splash screen
-                screenOptions={{ headerShown: false }} // Hide default headers for all screens
-              >
-                <Stack.Screen name="Splash" component={SplashScreen} />
-                <Stack.Screen name="SignIn" component={SignInScreen} />
-                <Stack.Screen name="SignUp" component={SignUpScreen} />
-                <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
-                <Stack.Screen name="CoordinatorNavigator" component={CoordinatorNavigator} />
-                {/* <Stack.Screen name="UserNavigator" component={UserNavigator} /> */}
-                <Stack.Screen name="SearchTask" component={SearchTaskScreen} />
-              </Stack.Navigator>
-            </NavigationContainer>
-          </PaperProvider>
-        </UserDataProvider>
+        <UserTasksProvider>
+          <UserDataProvider>
+            <PaperProvider>
+              <NavigationContainer linking={linking}>
+                {/* Stack Navigator to manage screens */}
+                <Stack.Navigator
+                  initialRouteName="Splash" // Start with the splash screen
+                  screenOptions={{ headerShown: false }} // Hide default headers for all screens
+                >
+                  <Stack.Screen name="Splash" component={SplashScreen} />
+                  <Stack.Screen name="SignIn" component={SignInScreen} />
+                  <Stack.Screen name="SignUp" component={SignUpScreen} />
+                  <Stack.Screen name="ForgotPassword" component={ForgotPasswordScreen} />
+                  <Stack.Screen name="CoordinatorNavigator" component={CoordinatorNavigator} />
+                  <Stack.Screen name="UserNavigator" component={UserNavigator} />
+                </Stack.Navigator>
+              </NavigationContainer>
+            </PaperProvider>
+          </UserDataProvider>
+        </UserTasksProvider>
       </UsersProvider>
     </TasksProvider>
   );
