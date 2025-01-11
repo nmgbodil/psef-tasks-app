@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+
 import { saveToken } from "../utils/auth_storage";
 import { login } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/RootStackParamList";
 import { useUserData } from "../hooks/useUserDataContext";
 import { UserRole } from "../utils/types";
 import { fetch_user_data } from "../services/task_api_services";
+import { gold } from "../utils/colors";
 
 const SignInScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -123,7 +125,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: "100%",
-        backgroundColor: "#CFB53B",
+        backgroundColor: `${gold}`,
         paddingVertical: 12,
         borderRadius: 8,
         alignItems: "center",

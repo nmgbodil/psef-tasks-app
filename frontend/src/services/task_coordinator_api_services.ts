@@ -1,6 +1,10 @@
+import { CommonActions } from "@react-navigation/native";
 import axios, { AxiosError } from "axios";
+
 import { TaskData } from "../utils/types";
 import { API_BASE_URL } from "../constants/api_constants";
+import { removeToken } from "../utils/auth_storage";
+import { navigation } from "../navigation/RootStackParamList";
 
 const apiClient = axios.create({
     baseURL: API_BASE_URL,
@@ -8,6 +12,32 @@ const apiClient = axios.create({
         "Content-Type": "application/json", // Default headers
     },
 });
+
+// Axios response interceptor for expired tokens
+apiClient.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+        if (error.response?.status === 401) {
+            console.error("Token expired, redirecting to login...");
+            // Remove the expired token
+            await removeToken();
+
+            //Redirect to the login page
+            if (navigation) {
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "SignIn"}]
+                    })
+                );
+            }
+            else {
+                console.error("Navigation object is not set!");
+            }
+        }
+        return Promise.reject(error); // Reject the error so the calling code can handle it
+    }
+)
 
 // Helper functions for API calls
 export const get_all_users = async (access_token: string) => {

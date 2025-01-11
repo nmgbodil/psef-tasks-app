@@ -1,0 +1,1 @@
+export const gold = "#c18d1d";

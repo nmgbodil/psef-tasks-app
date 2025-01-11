@@ -1,5 +1,5 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { NavigationContainer, NavigationProp, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Provider as PaperProvider } from "react-native-paper";
 import * as Linking from "expo-linking";
@@ -11,11 +11,11 @@ import SignUpScreen from "./src/screens/SignUpScreen";
 import ForgotPasswordScreen from "./src/screens/ForgotPasswordScreen";
 import CoordinatorNavigator from './src/navigation/CoordinatorNavigator';
 import { UsersProvider } from './src/hooks/useUsersContext';
-import SearchTaskScreen from './src/screens/Coordinator/SearchTaskScreen';
 import { RootStackParamList } from './src/navigation/RootStackParamList';
 import { UserDataProvider } from './src/hooks/useUserDataContext';
 import { UserTasksProvider } from './src/hooks/useUserTasksContext';
 import UserNavigator from './src/navigation/UserNavigator';
+import RootNavigationHandler from './src/components/RootNavigationHandler';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -39,6 +39,7 @@ const App = () => {
           <UserDataProvider>
             <PaperProvider>
               <NavigationContainer linking={linking}>
+                <RootNavigationHandler />
                 {/* Stack Navigator to manage screens */}
                 <Stack.Navigator
                   initialRouteName="Splash" // Start with the splash screen

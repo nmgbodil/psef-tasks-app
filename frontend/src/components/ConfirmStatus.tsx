@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import SimpleLineIcons from "react-native-vector-icons/SimpleLineIcons";
+import { format } from 'date-fns';
 
 import { TaskStatus } from "../utils/types";
 import { getToken } from "../utils/auth_storage";
 import { get_my_pending_tasks, update_status } from "../services/task_api_services";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "../navigation/RootStackParamList";
+import { monthDisplay } from "../utils/format";
 
 const ConfirmStatus = () => {
     const [pending_tasks, setPendingTasks] = useState<any>([]);
@@ -78,24 +80,32 @@ const ConfirmStatus = () => {
 
     return (
         <View>
-            {pending_tasks?.pending_tasks?.length > 0 && (
-                <View style={styles.container}>
-                    <Text style={styles.subTitle}>Did you do this recent task?</Text>
-                    <View style={styles.pendingContainer}>
-                        <View style={styles.textBox}>
-                            <Text>{pending_tasks?.pending_tasks[0]?.task_name}</Text>
-                            <Text>{pending_tasks?.pending_tasks[0]?.description}</Text>
-                            <Text>Date</Text>
+            {pending_tasks?.pending_tasks?.length > 0 && (() => {
+                    const task_to_confirm = pending_tasks?.pending_tasks[0];
+                    const day = format(new Date(task_to_confirm?.start_time), "d");       // 6 (day of the month)
+                    const month = format(new Date(task_to_confirm?.start_time), "MM");   // 01 (month)
+                    const start_time = format(new Date(task_to_confirm?.start_time), "HH:mm"); // 12:34 (hours and minutes)
+                    const end_time = format(new Date(task_to_confirm?.end_time), "HH:mm");
+
+                    return (
+                        <View style={styles.container}>
+                            <Text style={styles.subTitle}>Did you do this recent task?</Text>
+                            <View style={styles.pendingContainer}>
+                                <View style={styles.textBox}>
+                                    <Text>{task_to_confirm?.task_name}</Text>
+                                    <Text>{task_to_confirm?.description}</Text>
+                                    <Text>{day} {monthDisplay[month]} @ {start_time} - {end_time}</Text>
+                                </View>
+                                <TouchableOpacity onPress={() => markUndone(task_to_confirm?.assignment_id)}>
+                                    <SimpleLineIcons name="close" size={45} color="#093451" />
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => markDone(task_to_confirm?.assignment_id)}>
+                                <SimpleLineIcons name="check" size={45} color="#093451" />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <TouchableOpacity onPress={() => markUndone(pending_tasks?.pending_tasks[0]?.assignment_id)}>
-                            <SimpleLineIcons name="close" size={45} color="#093451" />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={() => markDone(pending_tasks?.pending_tasks[0]?.assignment_id)}>
-                        <SimpleLineIcons name="check" size={45} color="#093451" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            )}
+                    );
+                })()}
         </View>
     );
 };

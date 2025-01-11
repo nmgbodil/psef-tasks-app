@@ -1,4 +1,4 @@
-import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { NavigationProp } from "@react-navigation/native";
 
 export type RootStackParamList = {
     Splash: undefined;
@@ -14,4 +14,10 @@ export type RootStackParamList = {
         screen: string;
         params: any;
     } | undefined;
+};
+
+// Function to handle navigation to the login screen
+export let navigation: NavigationProp<any> | null = null;
+export const setNavigation = (nav: NavigationProp<any>) => {
+    navigation = nav;
 };

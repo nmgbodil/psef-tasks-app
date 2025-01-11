@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
+
 import { forgot_password } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/RootStackParamList";
+import { gold } from "../utils/colors";
 
 const ForgotPasswordScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<RootStackParamList>>();
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: "100%",
-        backgroundColor: "#CFB53B",
+        backgroundColor: `${gold}`,
         paddingVertical: 12,
         borderRadius: 8,
         alignItems: "center",

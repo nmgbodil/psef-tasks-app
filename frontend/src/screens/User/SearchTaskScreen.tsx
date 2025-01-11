@@ -11,6 +11,7 @@ import { useUserData } from "@/src/hooks/useUserDataContext";
 import { drop_task, signup_task } from "@/src/services/task_user_api_services";
 import { useUserTasks } from "@/src/hooks/useUserTasksContext";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { gold } from "@/src/utils/colors";
 
 const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
     const { title } = route.params;
@@ -156,8 +157,8 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
                 <View style={styles.topRow}>
-                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                    <Button title="Go" color="#f0b44a" onPress={handleSubmit} />
+                    <Button title="← Back" color={`${gold}`} onPress={() => navigation.goBack()} />
+                    <Button title="Go" color={`${gold}`} onPress={handleSubmit} />
                 </View>
                 <Text style={styles.title}>Search Task</Text>
                 <View style={styles.DataEntry}>
@@ -247,7 +248,7 @@ const styles = StyleSheet.create({
     },
     button: {
         width: "30%",
-        backgroundColor: "#CFB53B",
+        backgroundColor: `${gold}`,
         paddingVertical: 12,
         borderRadius: 20,
         alignItems: "center",

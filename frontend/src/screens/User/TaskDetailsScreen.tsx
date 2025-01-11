@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, TouchableOpacity, FlatList, ScrollView, SafeAreaView, Alert, ActivityIndicator } from "react-native";
 import {Menu, IconButton } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { NavigationProp } from "@react-navigation/native";
+import { format } from "date-fns";
 
 import { useTasks } from "@/src/hooks/useTasksContext";
 import ConfirmModal from "@/src/components/ConfirmModal";
@@ -11,6 +12,8 @@ import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 import { drop_task, signup_task } from "@/src/services/task_user_api_services";
 import { TaskDetailsProps } from "@/src/navigation/UserStackParamList";
 import { useUserTasks } from "@/src/hooks/useUserTasksContext";
+import { monthDisplay } from "@/src/utils/format";
+import { gold } from "@/src/utils/colors";
 
 const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const [taskMenuVisible, setTaskMenuVisible] = useState(false);
@@ -20,17 +23,22 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const { getUserTasks } = useUserTasks();
 
     if (loading) {
-        return <ActivityIndicator size="large" color="#f0a827"/>;
+        return <ActivityIndicator size="large" color={`${gold}`}/>;
     }
 
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
     
+    const day = format(new Date(task?.start_time), "d");
+    const month = format(new Date(task?.start_time), "MM");
+    const start_time = format(new Date(task?.start_time), "HH:mm");
+    const end_time = format(new Date(task?.end_time), "HH:mm");
+
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
         {key: "Category", value: task?.task_type || "No Category"},
-        {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
-        {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
+        {key: "Start", value: task?.start_time ? `${day} ${monthDisplay[month]} @ ${start_time}` : "Not specified"},
+        {key: "End", value: task?.end_time ? `${day} ${monthDisplay[month]} @ ${end_time}` : "Not specified"}
     ];
 
     let taskMenuOptions;
@@ -153,7 +161,7 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
                 <View style={styles.topRow}>
-                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
+                    <Button title="← Back" color={`${gold}`} onPress={() => navigation.goBack()} />
                     <Menu
                         visible={taskMenuVisible}
                         onDismiss={closeTaskMenu}
@@ -162,7 +170,7 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
                                 icon="dots-horizontal-circle"
                                 size={24}
                                 onPress={openTaskMenu}
-                                iconColor="#f0b44a"
+                                iconColor={`${gold}`}
                             />
                         }
                         style={styles.menuContainer}

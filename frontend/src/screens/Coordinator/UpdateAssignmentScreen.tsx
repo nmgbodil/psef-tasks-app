@@ -1,13 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, SafeAreaView } from "react-native";
 import DropDownPicker from "react-native-dropdown-picker";
+import { NavigationProp } from "@react-navigation/native";
+import { format } from "date-fns";
+
 import { getToken } from "@/src/utils/auth_storage";
 import {  update_assignment } from "@/src/services/task_coordinator_api_services";
-import { NavigationProp } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
 import { useUsers } from "@/src/hooks/useUsersContext";
 import { UpdateAssignmentProps } from "@/src/navigation/CoordinatorStackParamList";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { monthDisplay } from "@/src/utils/format";
+import { gold } from "@/src/utils/colors";
 
 const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) => {
     const { task_id, user_data } = route.params;
@@ -17,11 +21,16 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
     const assignment_id = user_data?.assignment_id?.toString();
 
+    const day = format(new Date(task?.start_time), "d");
+    const month = format(new Date(task?.start_time), "MM");
+    const start_time = format(new Date(task?.start_time), "HH:mm");
+    const end_time = format(new Date(task?.end_time), "HH:mm");
+
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
         {key: "Category", value: task?.task_type || "No Category"},
-        {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
-        {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
+        {key: "Start", value: task?.start_time ? `${day} ${monthDisplay[month]} @ ${start_time}` : "Not specified"},
+        {key: "End", value: task?.end_time ? `${day} ${monthDisplay[month]} @ ${end_time}` : "Not specified"}
     ];
 
     const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -81,8 +90,8 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
                 <View style={styles.topRow}>
-                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                    <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+                    <Button title="← Back" color={`${gold}`} onPress={() => navigation.goBack()} />
+                    <Button title="Done" color={`${gold}`} onPress={handleSubmit} />
                 </View>
                 <Text style={styles.title}>{task?.task_name}</Text>
                 <View style={styles.taskDataContainer}>

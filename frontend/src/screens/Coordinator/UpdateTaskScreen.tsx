@@ -1,15 +1,19 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from "react-native";
+import { NavigationProp } from "@react-navigation/native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { format } from "date-fns";
+
 import { TaskData } from "@/src/utils/types";
 import { getToken } from "@/src/utils/auth_storage";
 import { update_task } from "@/src/services/task_coordinator_api_services";
-import { NavigationProp } from "@react-navigation/native";
 import { useTasks } from "@/src/hooks/useTasksContext";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Icon from "react-native-vector-icons/MaterialIcons"
 import { UpdateTaskProps } from "@/src/navigation/CoordinatorStackParamList";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { monthDisplay } from "@/src/utils/format";
+import { gold } from "@/src/utils/colors";
 
 const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const { task_id } = route.params;
@@ -17,11 +21,16 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
     const task = tasks?.tasks[task_id.toString()];
     const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
+    const day = format(new Date(task?.start_time), "d");
+    const month = format(new Date(task?.start_time), "MM");
+    const formatted_start_time = format(new Date(task?.start_time), "HH:mm");
+    const formatted_end_time = format(new Date(task?.end_time), "HH:mm");
+
     const taskData = [
         {key: "Description", value: task?.description || "No description"},
         {key: "Category", value: task?.task_type || "No Category"},
-        {key: "Start", value: task?.start_time ? new Date(task.start_time).toLocaleString() : "Not specified"},
-        {key: "End", value: task?.end_time ? new Date(task.end_time).toLocaleString() : "Not specified"}
+        {key: "Start", value: task?.start_time ? `${day} ${monthDisplay[month]} @ ${formatted_start_time}` : "Not specified"},
+        {key: "End", value: task?.end_time ? `${day} ${monthDisplay[month]} @ ${formatted_end_time}` : "Not specified"}
     ];
 
     const [name, setName] = useState<string>("");
@@ -133,8 +142,8 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
                 <View style={styles.topRow}>
-                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                    <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+                    <Button title="← Back" color={`${gold}`} onPress={() => navigation.goBack()} />
+                    <Button title="Done" color={`${gold}`} onPress={handleSubmit} />
                 </View>
                 <Text style={styles.title}>{task?.task_name}</Text>
                 <KeyboardAvoidingView
@@ -196,27 +205,51 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                                 autoCapitalize="sentences"
                             />
                             <Text style={styles.text}>Start Date & Time</Text>
-                            <Text style={styles.dateText}>{start_time || "No date selected"}</Text>
-                            <Button title="Pick Date & Time" onPress={() => {setAdj("start"); showDatePicker();}} />
-                            <DateTimePickerModal
-                                isVisible={open[adj]}
-                                mode="datetime"
-                                onConfirm={handleChooseDate}
-                                onCancel={hideDatePicker}
-                            />
+                            {(() => {
+                                const day = start_time !== "" ? format(new Date(start_time), "d") : "";
+                                const month = start_time !== "" ? format(new Date(start_time), "MM") : "";
+                                const year = start_time !== "" ? format(new Date(start_time), "yyyy") : "";
+                                const selected_start_time = start_time !== "" ? format(new Date(start_time), "HH:mm") : "";
+                                const formatted_string = `${day} ${monthDisplay[month]}, ${year} @ ${selected_start_time}`;
+
+                                return (
+                                    <View>
+                                        <Text>{start_time !== "" ? formatted_string : "No date selected"}</Text>
+                                    <Button title="Pick Date & Time" color={`${gold}`} onPress={() => {setAdj("start"); showDatePicker();}} />
+                                    <DateTimePickerModal
+                                        isVisible={open[adj]}
+                                        mode="datetime"
+                                        onConfirm={handleChooseDate}
+                                        onCancel={hideDatePicker}
+                                    />
+                                    </View>
+                                );
+                            })()}
                             <Text style={styles.text}>End Date & Time</Text>
-                            <Text style={styles.dateText}>{end_time || "No date selected"}</Text>
-                            <Button title="Pick Date & Time" onPress={() => {setAdj("end"); showDatePicker();}} />
-                            <DateTimePickerModal
-                                isVisible={open[adj]}
-                                mode="datetime"
-                                onConfirm={handleChooseDate}
-                                onCancel={hideDatePicker}
-                            />
+                            {(() => {
+                                const day = end_time !== "" ? format(new Date(end_time), "d") : "";
+                                const month = end_time !== "" ? format(new Date(end_time), "MM") : "";
+                                const year = end_time !== "" ? format(new Date(end_time), "yyyy") : "";
+                                const selected_end_time = end_time !== "" ? format(new Date(end_time), "HH:mm") : "";
+                                const formatted_string = `${day} ${monthDisplay[month]}, ${year} @ ${selected_end_time}`;
+
+                                return (
+                                    <View>
+                                        <Text>{end_time !== "" ? formatted_string : "No date selected"}</Text>
+                                        <Button title="Pick Date & Time" color={`${gold}`} onPress={() => {setAdj("end"); showDatePicker();}} />
+                                        <DateTimePickerModal
+                                            isVisible={open[adj]}
+                                            mode="datetime"
+                                            onConfirm={handleChooseDate}
+                                            onCancel={hideDatePicker}
+                                        />
+                                    </View>
+                                );
+                            })()}
                             <View style={styles.checkbox}>
                                 <Text style={styles.text}>Maximum number of participants</Text>
                                 <TouchableOpacity onPress={() => openCloseNumberBox(!isChecked)}>
-                                    <Icon name={isChecked ? "check-box" : "check-box-outline-blank"} size={30} color="#f0b44a"/>
+                                    <Icon name={isChecked ? "check-box" : "check-box-outline-blank"} size={30} color={`${gold}`}/>
                                 </TouchableOpacity>
                             </View>
                             {isChecked && (

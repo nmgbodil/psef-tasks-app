@@ -1,14 +1,18 @@
 import React, { useState } from "react";
 import { View, Text, Button, StyleSheet, Alert, TextInput, KeyboardAvoidingView, Platform, SafeAreaView, TouchableOpacity } from "react-native";
-import {  TaskData } from "@/src/utils/types";
-import { getToken } from "@/src/utils/auth_storage";
-import { create_task } from "@/src/services/task_coordinator_api_services";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import Icon from "react-native-vector-icons/MaterialIcons"
+import Icon from "react-native-vector-icons/MaterialIcons";
+import { format } from "date-fns";
+
+import {  TaskData } from "@/src/utils/types";
+import { getToken } from "@/src/utils/auth_storage";
+import { create_task } from "@/src/services/task_coordinator_api_services";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
+import { monthDisplay } from "@/src/utils/format";
+import { gold } from "@/src/utils/colors";
 
 const CreateTaskScreen = () => {
     const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
@@ -126,8 +130,8 @@ const CreateTaskScreen = () => {
         <SafeAreaView style={styles.safeContainer}>
             <View style={styles.container}>
                 <View style={styles.topRow}>
-                    <Button title="← Back" color="#f0b44a" onPress={() => navigation.goBack()} />
-                    <Button title="Done" color="#f0b44a" onPress={handleSubmit} />
+                    <Button title="← Back" color={`${gold}`} onPress={() => navigation.goBack()} />
+                    <Button title="Done" color={`${gold}`} onPress={handleSubmit} />
                 </View>
                 <Text style={styles.title}>Create a new task</Text>
                 <KeyboardAvoidingView
@@ -167,27 +171,55 @@ const CreateTaskScreen = () => {
                                 autoCapitalize="sentences"
                             />
                             <Text style={styles.text}>Start Date & Time*</Text>
-                            <Text style={styles.dateText}>{start_time || "No date selected"}</Text>
-                            <Button title="Pick Date & Time" onPress={() => {setAdj("start"); showDatePicker();}} />
-                            <DateTimePickerModal
-                                isVisible={open[adj]}
-                                mode="datetime"
-                                onConfirm={handleChooseDate}
-                                onCancel={hideDatePicker}
-                            />
-                            <Text style={styles.text}>End Date & Time*</Text>
-                            <Text style={styles.dateText}>{end_time || "No date selected"}</Text>
-                            <Button title="Pick Date & Time" onPress={() => {setAdj("end"); showDatePicker();}} />
-                            <DateTimePickerModal
-                                isVisible={open[adj]}
-                                mode="datetime"
-                                onConfirm={handleChooseDate}
-                                onCancel={hideDatePicker}
-                            />
+                            {(() => {
+                                const day = start_time !== "" ? format(new Date(start_time), "d") : "";
+                                const month = start_time !== "" ? format(new Date(start_time), "MM") : "";
+                                const year = start_time !== "" ? format(new Date(start_time), "yyyy") : "";
+                                const selected_start_time = start_time !== "" ? format(new Date(start_time), "HH:mm") : "";
+                                const formatted_string = `${day} ${monthDisplay[month]}, ${year} @ ${selected_start_time}`;
+
+                                return (
+                                    <View>
+                                        <View style={styles.inputTime}>
+                                            <Text style={{ fontSize: 16 }}>{start_time !== "" ? formatted_string : "No date selected"}</Text>
+                                        </View>
+                                    <Button title="Pick Date & Time" color={`${gold}`} onPress={() => {setAdj("start"); showDatePicker();}} />
+                                    <DateTimePickerModal
+                                        isVisible={open[adj]}
+                                        mode="datetime"
+                                        onConfirm={handleChooseDate}
+                                        onCancel={hideDatePicker}
+                                    />
+                                    </View>
+                                );
+                            })()}
+                            <Text style={styles.text}>End Date & Time</Text>
+                            {(() => {
+                                const day = end_time !== "" ? format(new Date(end_time), "d") : "";
+                                const month = end_time !== "" ? format(new Date(end_time), "MM") : "";
+                                const year = end_time !== "" ? format(new Date(end_time), "yyyy") : "";
+                                const selected_end_time = end_time !== "" ? format(new Date(end_time), "HH:mm") : "";
+                                const formatted_string = `${day} ${monthDisplay[month]}, ${year} @ ${selected_end_time}`;
+
+                                return (
+                                    <View>
+                                        <View style={styles.inputTime}>
+                                            <Text style={{ fontSize: 16 }}>{end_time !== "" ? formatted_string : "No date selected"}</Text>
+                                        </View>
+                                        <Button title="Pick Date & Time" color={`${gold}`} onPress={() => {setAdj("end"); showDatePicker();}} />
+                                        <DateTimePickerModal
+                                            isVisible={open[adj]}
+                                            mode="datetime"
+                                            onConfirm={handleChooseDate}
+                                            onCancel={hideDatePicker}
+                                        />
+                                    </View>
+                                );
+                            })()}
                             <View style={styles.checkbox}>
                                 <Text style={styles.text}>Maximum number of participants</Text>
                                 <TouchableOpacity onPress={() => openCloseNumberBox(!isChecked)}>
-                                    <Icon name={isChecked ? "check-box" : "check-box-outline-blank"} size={30} color="#f0b44a"/>
+                                    <Icon name={isChecked ? "check-box" : "check-box-outline-blank"} size={30} color={`${gold}`}/>
                                 </TouchableOpacity>
                             </View>
                             {isChecked && (
@@ -262,6 +294,17 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 16,
         color: "#000000",
+    },
+    inputTime: {
+        width: "100%",
+        height: 50,
+        borderWidth: 1,
+        borderColor: "#D1D1D1",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        color: "#000000",
+        justifyContent: "center"
     }
 });
 

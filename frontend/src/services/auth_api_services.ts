@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios";
+
 import { UserData } from "../utils/types";
 import { API_BASE_URL } from "../constants/api_constants";
 

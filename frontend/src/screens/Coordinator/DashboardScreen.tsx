@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar } from "react-native";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { format } from 'date-fns';
 
 import { removeToken } from "../../utils/auth_storage";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
@@ -9,6 +10,8 @@ import ConfirmStatus from "@/src/components/ConfirmStatus";
 import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
 import { useUserData } from "@/src/hooks/useUserDataContext";
 import { useTasks } from "@/src/hooks/useTasksContext";
+import { monthDisplay } from "@/src/utils/format";
+import { gold } from "@/src/utils/colors";
 
 const DashboardScreen: React.FC = () => {
     const { tasks, getAllTasks, loading } = useTasks();
@@ -23,7 +26,6 @@ const DashboardScreen: React.FC = () => {
 
         fetchTasks();
     }, []);
-    console.log("Coordinator")
 
     const quickActions = [
         {label: "Create task", icon: "add-circle"},
@@ -32,7 +34,7 @@ const DashboardScreen: React.FC = () => {
     ];
 
     if (loading) {
-        return <ActivityIndicator size="large" color="#f0a827"/>;
+        return <ActivityIndicator size="large" color={`${gold}`}/>;
     }
 
     const handleLogout = async () => {
@@ -66,15 +68,34 @@ const DashboardScreen: React.FC = () => {
                 <ConfirmStatus />
                 <View style={styles.subContainer}>
                     <Text style={styles.subTitle}>Upcoming Tasks</Text>
-                    {tasks?.sorted_tasks?.map((task_id: any) => (
-                        <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
-                            <Text>{tasks?.tasks[task_id.toString()]?.task_name}</Text>
-                            <Text>From: {tasks?.tasks[task_id.toString()]?.start_time}</Text>
-                            <Text>To: {tasks?.tasks[task_id.toString()]?.end_time}</Text>
-                        </TouchableOpacity>
-                    ))}
-                    <TouchableOpacity>
-                        <Text style={styles.link}>View Full Calendar</Text>
+                    {tasks?.sorted_tasks?.map((task_id: any) => (() => {
+                        const task = tasks?.tasks[task_id.toString()]
+                        const day = format(new Date(task?.start_time), "d");
+                        const month = format(new Date(task?.start_time), "MM");
+                        const start_time = format(new Date(task?.start_time), "HH:mm");
+                        const end_time = format(new Date(task?.end_time), "HH:mm");
+
+                        return (
+                            <TouchableOpacity key={task_id} style={styles.task} onPress={() => handleTaskPress(task_id)}>
+                                <View style={styles.dateContainer}>
+                                    <Text style={styles.dateText}>{day}</Text>
+                                    <Text style={styles.monthText}>{monthDisplay[month].toUpperCase()}</Text>
+                                </View>
+                                <View style={styles.taskDetailsContainer}>
+                                    <View style={styles.row}>
+                                        <Text style={styles.firstRowText}>{task?.task_name}</Text>
+                                        <Text>{start_time}</Text>
+                                    </View>
+                                    <View style={styles.row}>
+                                        <Text style={{ color: "grey" }}>{task?.description}</Text>
+                                        <Text style={{ color: "grey" }}>{end_time}</Text>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        );
+                    })())}
+                    <TouchableOpacity style={styles.button}>
+                        <Text style={styles.buttonText}>View Full Calendar</Text>
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity onPress={handleLogout}>
@@ -85,7 +106,7 @@ const DashboardScreen: React.FC = () => {
                     {quickActions.map((item, index) => (
                             <TouchableOpacity key={index} style={styles.action} onPress={() => {handleQuickActionPress(item.label)}}>
                                 <Text style={styles.actionText}>{item?.label}</Text>
-                                <MaterialIcons name={item.icon} size={25} color="black" />
+                                <MaterialIcons name={item.icon} size={25} color={`${gold}`} />
                             </TouchableOpacity>
                     ))}
                 </View>
@@ -108,7 +129,7 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 30,
         fontWeight: "bold",
-        color: "#f0b44a",
+        color: "#000000",
         textAlign: "center",
     },
     pendingContainer: {
@@ -145,6 +166,50 @@ const styles = StyleSheet.create({
         padding: 8,
         backgroundColor: "#f9f9f9",
         borderRadius: 4,
+        flexDirection: "row",
+        justifyContent: "space-between"
+    },
+    dateContainer: {
+        flex: 1,
+        alignItems: "center",
+        flexDirection: "column",
+        justifyContent: "space-around"
+    },
+    dateText: {
+        fontSize: 28,
+        fontWeight: "600",
+        color: `${gold}`,
+    },
+    monthText: {
+        fontSize: 20,
+        fontWeight: "bold",
+        color: `${gold}`,
+    },
+    taskDetailsContainer: {
+        marginTop: 3,
+        flex: 4,
+    },
+    row: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    firstRowText: {
+        fontSize: 16,
+        fontWeight: "bold"
+    },
+    button: {
+        width: "40%",
+        height: 36,
+        backgroundColor: `${gold}`,
+        paddingVertical: 12,
+        borderRadius: 20,
+        alignItems: "center",
+        opacity: 0.5,
+    },
+    buttonText: {
+        fontSize: 10,
+        fontWeight: "bold",
+        color: "#FFFFFF",
     },
     link: {
         fontSize: 14,

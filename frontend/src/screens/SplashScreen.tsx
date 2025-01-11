@@ -3,11 +3,12 @@ import { View, StyleSheet, Animated } from "react-native";
 import { getToken } from "../utils/auth_storage";
 import { useUserData } from "../hooks/useUserDataContext";
 import { UserRole } from "../utils/types";
+import { fetch_user_data } from "../services/task_api_services";
 
 // SplashScreen component with navigation prop
 const SplashScreen = ({ navigation }: any) => {
     const fadeAnim = new Animated.Value(1); //Initial opacity set to fully visible
-    const { userData } = useUserData();
+    const { getUserData } = useUserData();
 
     useEffect(() => {
         // Start the fade-out animation when the component mounts
@@ -23,8 +24,9 @@ const SplashScreen = ({ navigation }: any) => {
 
     // Function check user's authentication status
     const checkAuthStatus = async () => {
-        const token = await getToken(); // Check for user login token
-        if (token) {
+        const access_token = await getToken(); // Check for user login token
+        if (access_token) {
+            const userData = await fetch_user_data(access_token);
             if (userData?.user?.role === UserRole.Coordinator) {
                 navigation.replace("CoordinatorNavigator");
             }
@@ -35,6 +37,8 @@ const SplashScreen = ({ navigation }: any) => {
         else {
             navigation.replace("SignIn");
         }
+
+        await getUserData();
     };
 
     return (
