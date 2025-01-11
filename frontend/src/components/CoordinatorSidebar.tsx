@@ -1,9 +1,11 @@
 import React from "react";
-import { createDrawerNavigator } from "@react-navigation/drawer";
+import { createDrawerNavigator, DrawerToggleButton } from "@react-navigation/drawer";
+
 import DashboardScreen from "../screens/Coordinator/DashboardScreen";
 import UsersScreen from "../screens/Coordinator/UsersScreen";
 import TasksScreen from "../screens/Coordinator/TasksScreen";
 import ProfileScreen from "../screens/ProfileScreen";
+import { gold } from "../utils/colors";
 
 const Drawer = createDrawerNavigator();
 
@@ -18,6 +20,15 @@ const Sidebar = () => {
                 backgroundColor: "#f8f9fa",
                 width: 240,
             },
+            drawerLabelStyle: {
+                color: "black",
+                fontSize: 16,
+            },
+            drawerActiveTintColor: `${gold}`,
+            drawerInactiveTintColor: "#6c757d",
+            headerLeft: (props) => (
+                <DrawerToggleButton {...props} tintColor={gold} />
+            )
         }}
         >
             <Drawer.Screen

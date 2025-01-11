@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp, CommonActions } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { format } from 'date-fns';
 
@@ -42,7 +42,12 @@ const DashboardScreen: React.FC = () => {
     const handleLogout = async () => {
         try {
             await removeToken();
-            parentNavigation.navigate("SignIn");
+            parentNavigation.dispatch(
+                CommonActions.reset({
+                    index: 0,
+                    routes: [{ name: "SignIn" }],
+                })
+            );
         }
         catch (error) {
             Alert.alert("Error");

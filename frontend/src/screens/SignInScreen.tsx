@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
-import { useNavigation, NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp, CommonActions } from "@react-navigation/native";
 
 import { saveToken } from "../utils/auth_storage";
 import { login } from "../services/auth_api_services";
@@ -30,9 +30,21 @@ const SignInScreen: React.FC = () => {
                 await saveToken(access_token);
                 const userData = await fetch_user_data(access_token);
                 if (userData?.user?.role === UserRole.Coordinator) {
-                    navigation.replace("CoordinatorNavigator");
+                    // navigation.replace("CoordinatorNavigator");
+                    navigation.dispatch(
+                        CommonActions.reset({
+                            index: 0,
+                            routes: [{ name: "CoordinatorNavigator" }]
+                        })
+                    );
                 } else {
-                    navigation.replace("UserNavigator");
+                    // navigation.replace("UserNavigator");
+                    navigation.dispatch(
+                        CommonActions.reset({
+                            index: 0,
+                            routes: [{ name: "UserNavigator" }]
+                        })
+                    );
                 }
                 await getUserData();
             }

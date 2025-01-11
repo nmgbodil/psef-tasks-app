@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, SafeAreaView, Text, StyleSheet, Alert, TouchableOpacity } from "react-native";
 import { NavigationProp } from "@react-navigation/native";
+import { format } from 'date-fns';
 
 import DropDownPicker from "react-native-dropdown-picker";
 import ConfirmModal from "../../components/ConfirmModal";
@@ -11,6 +12,7 @@ import { useUserData } from "@/src/hooks/useUserDataContext";
 import { drop_task, signup_task } from "@/src/services/task_user_api_services";
 import { useUserTasks } from "@/src/hooks/useUserTasksContext";
 import { RootStackParamList } from "@/src/navigation/RootStackParamList";
+import { monthDisplay } from "@/src/utils/format";
 import { gold } from "@/src/utils/colors";
 
 const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
@@ -72,10 +74,18 @@ const SearchTaskScreen = ({route, navigation}: SearchTaskProps) => {
 
     useEffect(() => {
         const format_tasks = () => {
-            setFormattedTasks(tasks?.sorted_tasks.map((task_id) => ({
-                label: `${tasks?.tasks[task_id.toString()]?.task_name} (${tasks?.tasks[task_id.toString()]?.description}) ${tasks?.tasks[task_id.toString()]?.start_time} - ${tasks?.tasks[task_id.toString()]?.end_time}`,
-                value: task_id
-            })));
+            setFormattedTasks(tasks?.sorted_tasks.map((task_id) => {
+                const task = tasks?.tasks[task_id.toString()];
+                const day = format(new Date(task?.start_time), "d");
+                const month = format(new Date(task?.start_time), "MM");
+                const start_time = format(new Date(task?.start_time), "HH:mm");
+                const end_time = format(new Date(task?.end_time), "HH:mm");
+
+                return {
+                    label: `${task?.task_name} (${task?.description}), ${day} ${monthDisplay[month]} @ ${start_time} - ${end_time}`,
+                    value: task_id
+                }
+            }));
         };
 
         format_tasks();
