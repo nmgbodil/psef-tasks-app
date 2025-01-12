@@ -16,6 +16,7 @@ import { UserDataProvider } from './src/hooks/useUserDataContext';
 import { UserTasksProvider } from './src/hooks/useUserTasksContext';
 import UserNavigator from './src/navigation/UserNavigator';
 import RootNavigationHandler from './src/components/RootNavigationHandler';
+import { StatusBar } from 'react-native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -39,6 +40,7 @@ const App = () => {
           <UserDataProvider>
             <PaperProvider>
               <NavigationContainer linking={linking}>
+                <StatusBar hidden={false} />
                 <RootNavigationHandler />
                 {/* Stack Navigator to manage screens */}
                 <Stack.Navigator

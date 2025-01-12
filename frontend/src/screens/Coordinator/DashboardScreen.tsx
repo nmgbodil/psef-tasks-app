@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView, StatusBar } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from "react-native";
 import { useNavigation, NavigationProp, CommonActions } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { format } from 'date-fns';
@@ -67,13 +67,14 @@ const DashboardScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.safeContainer}>
-            <StatusBar hidden={false} />
             <ScrollView style={styles.container}>
                 <Text style={styles.title}>Welcome, {userData?.user?.first_name || "User"}!</Text>
                 <ConfirmStatus />
                 <View style={styles.subContainer}>
                     <Text style={styles.subTitle}>Upcoming Tasks</Text>
-                    {tasks?.sorted_tasks?.map((task_id: any) => (() => {
+                    {tasks?.sorted_tasks?.map((task_id: any, index: number) => (() => {
+                        if (index >= 5) return null;
+
                         const task = tasks?.tasks[task_id.toString()]
                         const day = format(new Date(task?.start_time), "d");
                         const month = format(new Date(task?.start_time), "MM");
