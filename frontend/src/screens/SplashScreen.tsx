@@ -1,9 +1,10 @@
 import React, { useEffect } from "react"
 import { View, StyleSheet, Animated } from "react-native";
+
 import { getToken } from "../utils/auth_storage";
 import { useUserData } from "../hooks/useUserDataContext";
 import { UserRole } from "../utils/types";
-import { fetch_user_data } from "../services/task_api_services";
+import { fetch_user_data } from "../services/user_api_services";
 
 // SplashScreen component with navigation prop
 const SplashScreen = ({ navigation }: any) => {

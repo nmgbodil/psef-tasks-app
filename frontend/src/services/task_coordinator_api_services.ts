@@ -13,21 +13,41 @@ const apiClient = axios.create({
     },
 });
 
-// Axios response interceptor for expired tokens
+// Axios response interceptor
 apiClient.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
+        // Check for expired access tokens
         if (error.response?.status === 401) {
             console.error("Token expired, redirecting to login...");
             // Remove the expired token
             await removeToken();
 
-            //Redirect to the login page
+            // Redirect to the login page
             if (navigation) {
                 navigation.dispatch(
                     CommonActions.reset({
                         index: 0,
-                        routes: [{ name: "SignIn"}]
+                        routes: [{ name: "SignIn" }],
+                    })
+                );
+            }
+            else {
+                console.error("Navigation object is not set!");
+            }
+        }
+        // Check if user exists
+        else if (error.response?.status === 403 && error.response?.data?.error === "Account deleted") {
+            console.error("This user does not exist, redirecting to signup...");
+            // Remove access token
+            await removeToken();
+
+            // Redirect to the signup page
+            if (navigation) {
+                navigation.dispatch(
+                    CommonActions.reset({
+                        index: 0,
+                        routes: [{ name: "SignUp" }],
                     })
                 );
             }
@@ -37,7 +57,7 @@ apiClient.interceptors.response.use(
         }
         return Promise.reject(error); // Reject the error so the calling code can handle it
     }
-)
+);
 
 // Helper functions for API calls
 export const get_all_users = async (access_token: string) => {
@@ -127,6 +147,32 @@ export const update_assignment = async (access_token: string, assignment_id: str
     catch (error) {
         const axiosError = error as AxiosError;
         console.error("Update Assignment API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
+    }
+};
+
+export const override_status = async (access_token: string, assignment_id: string, status: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.patch(`tasks/coordinator/override_status/${assignment_id}`, { status });
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Override Status API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
+    }
+};
+
+export const delete_user = async (access_token: string, user_to_delete: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.delete(`tasks/coordinator/delete_user/${user_to_delete}`);
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Delete User API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred"};
     }
 };

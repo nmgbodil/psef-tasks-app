@@ -17,6 +17,7 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
+        console.log(error);
         // Check for expired access tokens
         if (error.response?.status === 401) {
             console.error("Token expired, redirecting to login...");
@@ -60,41 +61,54 @@ apiClient.interceptors.response.use(
 );
 
 // Helper functions for API calls
-export const signup_task = async (access_token: string, task_id: string) => {
+export const fetch_user_data = async (access_token: string) => {
     try {
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`
-        const response = await apiClient.post("tasks/user/signup", { task_id });
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.get("user/my_user");
         return response.data;
     }
     catch (error) {
         const axiosError = error as AxiosError;
-        console.error("Signup Task API Error:", axiosError.response?.data || axiosError.message);
+        console.error("Get User API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };
 
-export const drop_task = async (access_token: string, assignment_id: string) => {
+export const update_first_name = async (access_token: string, first_name: string) => {
     try {
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`
-        const response = await apiClient.delete(`tasks/user/drop_task/${assignment_id}`);
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.patch("user/update_first_name", { first_name });
         return response.data;
     }
     catch (error) {
         const axiosError = error as AxiosError;
-        console.error("Drop Task API Error:", axiosError.response?.data || axiosError.message);
+        console.error("Update First Name API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };
 
-export const get_my_tasks = async (access_token: string) => {
+export const update_last_name = async (access_token: string, last_name: string) => {
     try {
-        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`
-        const response = await apiClient.get(`tasks/user/my_tasks`);
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.patch("user/update_last_name", { last_name });
         return response.data;
     }
     catch (error) {
         const axiosError = error as AxiosError;
-        console.error("Get User Tasks API Error:", axiosError.response?.data || axiosError.message);
+        console.error("Update Last Name API Error:", axiosError.response?.data || axiosError.message);
+        throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
+    }
+};
+
+export const delete_user = async (access_token: string) => {
+    try {
+        apiClient.defaults.headers.common["Authorization"] = `Bearer ${access_token}`;
+        const response = await apiClient.delete("user/delete_user");
+        return response.data;
+    }
+    catch (error) {
+        const axiosError = error as AxiosError;
+        console.error("Delete User API Error:", axiosError.response?.data || axiosError.message);
         throw axiosError.response?.data || { axiosError: "Unknown error occurred" };
     }
 };

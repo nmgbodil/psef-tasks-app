@@ -20,7 +20,7 @@ const ConfirmModal = ({ visible, message, onConfirm, onCancel }: ConfirmModalPro
                 <View style={styles.modal}>
                     <Text style={styles.message}>{message}</Text>
                     <View style={styles.buttonContainer}>
-                        <Button title="Confirm" onPress={onConfirm} />
+                        <Button title="Confirm" color="red" onPress={onConfirm} />
                         <Button title="Cancel" onPress={onCancel} />
                     </View>
                 </View>

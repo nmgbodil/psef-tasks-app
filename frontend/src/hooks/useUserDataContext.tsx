@@ -2,7 +2,7 @@ import React, { createContext, ReactNode, useContext, useState } from "react";
 
 import { UserRole } from "../utils/types";
 import { getToken } from "../utils/auth_storage";
-import { fetch_user_data } from "../services/task_api_services";
+import { fetch_user_data } from "../services/user_api_services";
 
 interface UserDataContextType {
     userData: {

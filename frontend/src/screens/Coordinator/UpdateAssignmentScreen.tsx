@@ -56,6 +56,9 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
                 case "Unauthorized":
                     Alert.alert("Error", "This account is unauthorized for this action");
                     break;
+                case "Task doer does not exist":
+                    Alert.alert("Error", "Task doer does not exist");
+                    break;
                 default:
                     Alert.alert("Error", error.error);
                     break;
@@ -67,7 +70,7 @@ const UpdateAssignmentScreen = ({ route, navigation }: UpdateAssignmentProps) =>
         try {
             const access_token = await getToken();
             if (selectedUser && access_token && assignment_id) {
-                const data = await update_assignment(access_token, selectedUser, assignment_id);
+                const data = await update_assignment(access_token, assignment_id, selectedUser);
     
                 if (data.message === "Assignment successfully updated") {
                     Alert.alert("Success", "Assignment successfully updated");

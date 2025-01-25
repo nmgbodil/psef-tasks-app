@@ -37,21 +37,6 @@ const DashboardScreen: React.FC = () => {
         return <ActivityIndicator size="large" color={`${gold}`}/>;
     }
 
-    const handleLogout = async () => {
-        try {
-            await removeToken();
-            parentNavigation.dispatch(
-                CommonActions.reset({
-                    index: 0,
-                    routes: [{ name: "SignIn" }],
-                })
-            );
-        }
-        catch (error) {
-            Alert.alert("Error");
-        }
-    };
-
     const handleTaskPress = (task_id: number) => {
         navigation.navigate("TaskDetails", { task_id })
     };
@@ -104,9 +89,6 @@ const DashboardScreen: React.FC = () => {
                         <Text style={styles.buttonText}>View Full Calendar</Text>
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity onPress={handleLogout}>
-                    <Text style={styles.link}>Log out</Text>
-                </TouchableOpacity>
                 <View style={styles.actionsContainer}>
                     <Text style={styles.subTitle}>Quick Actions</Text>
                     {quickActions.map((item, index) => (

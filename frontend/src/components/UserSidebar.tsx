@@ -2,6 +2,7 @@ import React from "react";
 import { createDrawerNavigator, DrawerToggleButton } from "@react-navigation/drawer";
 
 import DashboardScreen from "../screens/User/DashboardScreen";
+import ProfileScreen from "../screens/ProfileScreen";
 import { gold } from "../utils/colors";
 
 const Drawer = createDrawerNavigator();
@@ -32,6 +33,11 @@ const Sidebar = () => {
                 name="Dashboard"
                 component={DashboardScreen}
                 options={{ title: "Dashboard" }}
+            />
+            <Drawer.Screen
+                name="Profile"
+                component={ProfileScreen}
+                options={{ title: "Profile" }}
             />
         </Drawer.Navigator>
     )

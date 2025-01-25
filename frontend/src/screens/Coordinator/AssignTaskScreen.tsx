@@ -58,6 +58,9 @@ const AssignTaskScreen = ({ route, navigation }: AssignTaskProps) => {
                 case "Unauthorized":
                     Alert.alert("Error", "This account is unauthorized for this action");
                     break;
+                case "Task doer does not exist":
+                    Alert.alert("Error", "Task doer does not exist");
+                    break;
                 default:
                     Alert.alert("Error", error.error);
                     break;

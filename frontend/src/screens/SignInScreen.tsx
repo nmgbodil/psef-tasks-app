@@ -7,7 +7,7 @@ import { login } from "../services/auth_api_services";
 import { RootStackParamList } from "../navigation/RootStackParamList";
 import { useUserData } from "../hooks/useUserDataContext";
 import { UserRole } from "../utils/types";
-import { fetch_user_data } from "../services/task_api_services";
+import { fetch_user_data } from "../services/user_api_services";
 import { gold } from "../utils/colors";
 
 const SignInScreen: React.FC = () => {
