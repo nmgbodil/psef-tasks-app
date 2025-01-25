@@ -26,7 +26,7 @@ def signup_task():
 
         if result == 'assignment successfully created':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -40,6 +40,8 @@ def signup_task():
             return jsonify({'error': 'Maximum participants reached'}), HTTP_400_BAD_REQUEST
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -58,7 +60,7 @@ def drop_task(assignment_id):
 
         if result == 'task successfully dropped':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -66,6 +68,8 @@ def drop_task(assignment_id):
             return jsonify({'message': 'Task successfully dropped'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -88,6 +92,8 @@ def get_my_tasks():
             return jsonify({'message': 'User tasks successfully retrieved', 'user_tasks': task_list}), HTTP_200_OK
         elif message == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif message == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     

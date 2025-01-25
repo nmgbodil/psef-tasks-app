@@ -5,6 +5,9 @@ from src.utils import format_response
 
 def signup_task(user_id: str, task_id: str):
     try:
+        if not user_dal.check_user_exists_by_id(user_id):
+            return 'DNE'
+
         # Access control for users only
         user = user_dal.get_user_by_id(user_id)
         if user.role != UserRole.USER:
@@ -37,6 +40,9 @@ def signup_task(user_id: str, task_id: str):
     
 def drop_task(user_id: str, assignment_id: str):
     try:
+        if not user_dal.check_user_exists_by_id(user_id):
+            return 'DNE'
+
         # Access control for users only
         if user_dal.get_user_role(user_id) != UserRole.USER:
             return 'user unauthorized'
@@ -57,6 +63,9 @@ def get_my_tasks(user_id: str):
     results = {'message': None, 'task_list': None}
 
     try:
+        if not user_dal.check_user_exists_by_id(user_id):
+            results['message'] = 'DNE'
+            return results
         # Access control for users only
         if user_dal.get_user_role(user_id) != UserRole.USER:
             results['message'] = 'user unauthorized'

@@ -6,6 +6,7 @@ from src.models.task_model import Task
 from src.managers import task_manager, task_coordinator_manager
 from src.constants.http_status_codes import *
 from src.utils import broadcasts
+from src.models.assignment_model import Status
 
 task_coordinator = Blueprint("task_coordinator", __name__, url_prefix="/api/v1/tasks/coordinator")
 
@@ -36,7 +37,7 @@ def create_task():
 
         if result == 'task successfully created':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -45,7 +46,9 @@ def create_task():
         elif result == 'task exists':
             return jsonify({'error': 'Task has already been created'}), HTTP_409_CONFLICT
         elif result == 'user unauthorized':
-            return jsonify({'error': "Unauthorized"}), HTTP_401_UNAUTHORIZED
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -75,7 +78,7 @@ def assign_task():
 
         if result == 'assignment successfully created':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -89,6 +92,10 @@ def assign_task():
             return jsonify({'error': 'Maximum participants reached'}), HTTP_400_BAD_REQUEST
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
+        elif result == 'task doer does not exist':
+            return jsonify({'error': 'Task doer does not exist'}), HTTP_400_BAD_REQUEST
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -107,7 +114,7 @@ def delete_task(task_id):
 
         if result == 'task successfully deleted':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -115,6 +122,8 @@ def delete_task(task_id):
             return jsonify({'message': 'Task successfully deleted'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -133,7 +142,7 @@ def delete_assignment(assignment_id):
 
         if result == 'assignment successfully deleted':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -141,6 +150,8 @@ def delete_assignment(assignment_id):
             return jsonify({'message': 'Assignment successfully deleted'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -167,7 +178,7 @@ def update_task(task_id):
 
         if result == 'task successfully updated':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -175,6 +186,8 @@ def update_task(task_id):
             return jsonify({'message': 'Task successfully updated'}), HTTP_200_OK
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -200,7 +213,7 @@ def update_assignment(assignment_id):
 
         if result == 'assignment successfully updated':
             # Retrieve the updated task list to broadcast
-            updated_tasks = task_manager.get_all_tasks()
+            updated_tasks = task_manager.get_all_tasks(user_id)
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
@@ -212,6 +225,10 @@ def update_assignment(assignment_id):
             return jsonify({'error': 'Task doer not free at this time'}), HTTP_409_CONFLICT
         elif result == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
+        elif result == 'task doer does not exist':
+            return jsonify({'error': 'Task doer does not exist'}), HTTP_400_BAD_REQUEST
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -234,6 +251,8 @@ def get_all_users():
             return jsonify({'message': 'Users successfully retrieved', 'users': user_list}), HTTP_200_OK
         elif message == 'user unauthorized':
             return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif message == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
     
@@ -241,3 +260,67 @@ def get_all_users():
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.patch("/override_status/<string:assignment_id>")
+@jwt_required()
+def override_status(assignment_id):
+    user_id = get_jwt_identity()
+
+    try:
+        data = request.get_json()
+        required_fields = ['status']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f'Missing fields: {', '.join(missing_fields)}'}), HTTP_400_BAD_REQUEST
+        
+        status = data.get('status')
+        if status != Status.COMPLETED and status != Status.INCOMPLETED:
+            return jsonify({'error': f'Invalid status data: {status}'}), HTTP_400_BAD_REQUEST
+        
+        result = task_coordinator_manager.override_status(user_id, status, assignment_id)
+
+        if result == 'task status successfully overridden':
+            return jsonify({'message': 'Task status successfully overriden'}), HTTP_200_OK
+        elif result == 'task not over':
+            return jsonify({'message': 'Task is not over yet'}), HTTP_400_BAD_REQUEST
+        elif result == 'user unauthorized':
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        elif result == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+    
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.delete("/delete_user/<string:user_to_delete>")
+@jwt_required()
+def delete_user(user_to_delete):
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_coordinator_manager.delete_user(user_id, user_to_delete)
+
+        if result == 'user deleted successfully':
+            # Retrieve the updated task list to broadcast
+            updated_tasks = task_manager.get_all_tasks(user_id)
+
+            # Broadcast updated task list
+            broadcasts.broadcast_tasks_update(updated_tasks)
+
+            return jsonify({'message': 'User deleted successfully'}), HTTP_200_OK
+        elif result == 'DNE':
+            return jsonify({'error': 'This user no longer exists'}), HTTP_403_FORBIDDEN
+        elif result == 'user to delete does not exist':
+            return jsonify({'error': 'The user you tried to delete does not exist'}), HTTP_400_BAD_REQUEST
+        elif result == 'user unauthorized':
+            return jsonify({'error': 'Unauthorized'}), HTTP_401_UNAUTHORIZED
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR    

@@ -9,6 +9,7 @@ import datetime
 from dotenv import load_dotenv
 
 from src.views.auth_view import auth
+from src.views.user_view import user
 from src.views.task_view import task
 from src.views.task_user_view import task_user
 from src.views.task_coordinator_view import task_coordinator
@@ -46,6 +47,7 @@ def create_app(test_config=None):
 
     # App Blueprints
     app.register_blueprint(auth)
+    app.register_blueprint(user)
     app.register_blueprint(task)
     app.register_blueprint(task_user)
     app.register_blueprint(task_coordinator)

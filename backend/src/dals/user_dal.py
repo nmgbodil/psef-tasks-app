@@ -110,3 +110,17 @@ def update_user_password(user_id, password_hash):
     set_user_updated_at(user_id)
 
     sync_db_util.execute_query_return_row_count(statement)
+
+def update_user_first_name(user_id, first_name):
+    statement = f'''UPDATE users SET first_name = '{first_name}' WHERE user_id = '{user_id}';'''
+
+    set_user_updated_at(user_id)
+
+    sync_db_util.execute_query_return_row_count(statement)
+
+def update_user_last_name(user_id, last_name):
+    statement = f'''UPDATE users SET last_name = '{last_name}' WHERE user_id = '{user_id}';'''
+
+    set_user_updated_at(user_id)
+
+    sync_db_util.execute_query_return_row_count(statement)

@@ -146,5 +146,4 @@ def add_assignments_status():
         print(f'Error adding status column to assignments table: {e}')
 
 if __name__ == "__main__":
-    delete_tasks_task_status()
-    add_assignments_status()
+    make_user_coordinator('nmgbodil@purdue.edu')
