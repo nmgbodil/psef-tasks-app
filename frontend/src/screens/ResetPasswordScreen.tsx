@@ -14,7 +14,7 @@ const ResetPasswordScreen: React.FC = () => {
     const [confirm_password, setConfirmPassword] = useState<string>("");
 
     const handleResetPassword = async () => {
-        if (!new_password || !confirm_password) {
+        if (new_password?.length == 0 || confirm_password?.length == 0) {
             Alert.alert("Error", "Please enter all required information.");
             return;
         }

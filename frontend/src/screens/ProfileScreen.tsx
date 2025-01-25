@@ -13,6 +13,7 @@ import SwipeButton from "../components/SwipeButton";
 import { getToken, removeToken } from "../utils/auth_storage";
 import { delete_user, update_first_name, update_last_name } from "../services/user_api_services";
 import ConfirmModal from "../components/ConfirmModal";
+import { forgot_password } from "../services/auth_api_services";
 
 const ProfileScreen: React.FC = () => {
     const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
@@ -110,6 +111,22 @@ const ProfileScreen: React.FC = () => {
             }
             else {
                 parentNavigation.navigate("SignIn");
+            }
+        }
+        catch (error: any) {
+            if (error.error) {
+                Alert.alert("Error", error?.error);
+            }
+        }
+    };
+
+    const editPassword = async () => {
+        try {
+            const data = await forgot_password(userData?.user?.email);
+
+            if (data.message === "Password reset email sent") {
+                Alert.alert("", "Password reset email sent")
+                return;
             }
         }
         catch (error: any) {
@@ -238,7 +255,7 @@ const ProfileScreen: React.FC = () => {
                                         <Text style={styles.dataTitle}>Password</Text>
                                         <Text style={styles.dataEntry}>**********</Text>
                                     </View>
-                                    <TouchableOpacity style={styles.icon}>
+                                    <TouchableOpacity style={styles.icon} onPress={editPassword}>
                                         <MaterialIcons name="edit" size={iconSize} color={gold} />
                                     </TouchableOpacity>
                                 </View>
