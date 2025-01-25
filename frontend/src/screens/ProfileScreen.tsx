@@ -162,6 +162,7 @@ const ProfileScreen: React.FC = () => {
                 const data = await delete_user(access_token);
 
                 if (data.message === "User deleted successfully") {
+                    await removeToken();
                     Alert.alert("", "Your account has been deleted");
                     parentNavigation.dispatch(
                         CommonActions.reset({
