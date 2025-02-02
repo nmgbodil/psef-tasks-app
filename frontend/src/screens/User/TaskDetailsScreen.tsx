@@ -4,6 +4,7 @@ import {Menu, IconButton } from "react-native-paper";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { NavigationProp } from "@react-navigation/native";
 import { format } from "date-fns";
+// import { toZonedTime } from "date-fns-tz";
 
 import { useTasks } from "@/src/hooks/useTasksContext";
 import ConfirmModal from "@/src/components/ConfirmModal";
@@ -32,6 +33,7 @@ const TaskDetailsScreen = ({ route, navigation }: TaskDetailsProps) => {
     const day = format(new Date(task?.start_time), "d");
     const month = format(new Date(task?.start_time), "MM");
     const start_time = format(new Date(task?.start_time), "HH:mm");
+    // const start_time = format(toZonedTime(new Date(task?.start_time), Intl.DateTimeFormat().resolvedOptions().), "HH:mm");
     const end_time = format(new Date(task?.end_time), "HH:mm");
 
     const taskData = [

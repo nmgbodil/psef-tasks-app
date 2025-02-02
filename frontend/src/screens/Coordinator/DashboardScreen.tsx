@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, SafeAreaView, ScrollView } from "react-native";
-import { useNavigation, NavigationProp, CommonActions } from "@react-navigation/native";
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, SafeAreaView, ScrollView } from "react-native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { format } from 'date-fns';
 
-import { removeToken } from "../../utils/auth_storage";
-import { RootStackParamList } from "@/src/navigation/RootStackParamList";
 import ConfirmStatus from "@/src/components/ConfirmStatus";
 import { CoordinatorStackParamList } from "@/src/navigation/CoordinatorStackParamList";
 import { useUserData } from "@/src/hooks/useUserDataContext";
@@ -17,7 +15,6 @@ const DashboardScreen: React.FC = () => {
     const { tasks, getAllTasks, loading } = useTasks();
     const { userData } = useUserData();
     const navigation = useNavigation<NavigationProp<CoordinatorStackParamList>>();
-    const parentNavigation = navigation.getParent<NavigationProp<RootStackParamList>>();
 
     useEffect(() => {
         const fetchTasks = async () => {

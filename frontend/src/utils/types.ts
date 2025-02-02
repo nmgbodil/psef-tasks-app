@@ -20,7 +20,6 @@ export interface TaskData {
     start_time: string | null;
     end_time: string | null;
     max_participants: number | null;
-    status: TaskStatus | null;
 };
 
 export enum TaskStatus {

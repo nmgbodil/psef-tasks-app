@@ -17,7 +17,6 @@ const apiClient = axios.create({
 apiClient.interceptors.response.use(
     (response) => response,
     async (error: AxiosError) => {
-        console.log(error);
         // Check for expired access tokens
         if (error.response?.status === 401) {
             console.error("Token expired, redirecting to login...");

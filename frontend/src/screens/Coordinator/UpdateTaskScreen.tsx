@@ -115,7 +115,6 @@ const UpdateTaskScreen = ({ route, navigation }: UpdateTaskProps) => {
                     start_time: start_time,
                     end_time: end_time,
                     max_participants: max_participants,
-                    status: null
                 };
                 const data = await update_task(access_token, task_updates, task_id);
                 if (data.message === "Task successfully updated") {

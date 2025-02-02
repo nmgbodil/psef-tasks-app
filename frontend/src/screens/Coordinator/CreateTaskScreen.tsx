@@ -103,7 +103,6 @@ const CreateTaskScreen = () => {
                     start_time: start_time,
                     end_time: end_time,
                     max_participants: max_participants,
-                    status: null
                 };
                 const data = await create_task(access_token, task);
                 if (data.message === "Task successfully created") {
