@@ -145,5 +145,21 @@ def add_assignments_status():
     except Exception as e:
         print(f'Error adding status column to assignments table: {e}')
 
+def alter_time_type():
+    statement = f'''
+    ALTER TABLE tasks
+    ALTER COLUMN start_time SET DATA TYPE TIMESTAMP WITH TIME ZONE
+    USING start_time AT TIME ZONE 'UTC';
+    ALTER TABLE tasks
+    ALTER COLUMN end_time SET DATA TYPE TIMESTAMP WITH TIME ZONE
+    USING end_time AT TIME ZONE 'UTC';
+    '''
+
+    try:
+        sync_db_util.execute_query_insert(statement)
+        print("Time columns data type successfully edited")
+    except Exception as e:
+        print(f'Error editing time column data type: {e}')
+
 if __name__ == "__main__":
-    make_user_coordinator('nmgbodil@purdue.edu')
+    alter_time_type()
