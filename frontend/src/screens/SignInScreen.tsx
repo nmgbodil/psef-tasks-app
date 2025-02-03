@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useNavigation, NavigationProp, CommonActions } from "@react-navigation/native";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 import { saveToken } from "../utils/auth_storage";
 import { login } from "../services/auth_api_services";
@@ -15,6 +16,8 @@ const SignInScreen: React.FC = () => {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const { getUserData } = useUserData();
+
+    const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
 
     const handleSignIn = async () => {
         if (!email || !password) {
@@ -84,14 +87,19 @@ const SignInScreen: React.FC = () => {
                 keyboardType="email-address"
                 autoCapitalize="none"
             />
-            <TextInput
-                placeholder="Password"
-                placeholderTextColor="#A0A0A0"
-                value={password}
-                onChangeText={setPassword}
-                style={styles.input}
-                secureTextEntry
-            />
+            <View style={styles.passwordContainer}>
+                <TextInput
+                    placeholder="Password"
+                    placeholderTextColor="#A0A0A0"
+                    value={password}
+                    onChangeText={setPassword}
+                    style={styles.passwordInput}
+                    secureTextEntry={!passwordVisible}
+                />
+                <TouchableOpacity onPress={() => setPasswordVisible(!passwordVisible)}>
+                    <MaterialIcons name={passwordVisible ? "visibility" : "visibility-off"} size={24} color="grey" />
+                </TouchableOpacity>
+            </View>
             <TouchableOpacity style={styles.button} onPress={handleSignIn}>
                 <Text style={styles.buttonText}>Sign In</Text>
             </TouchableOpacity>
@@ -133,6 +141,23 @@ const styles = StyleSheet.create({
         paddingHorizontal: 12,
         fontSize: 16,
         marginBottom: 16,
+        color: "#000000",
+    },
+    passwordContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        width: "100%",
+        borderWidth: 1,
+        borderColor: "#D1D1D1",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        marginBottom: 16,
+        justifyContent: "space-between",
+    },
+    passwordInput: {
+        flex: 1,
+        height: 50,
+        fontSize: 16,
         color: "#000000",
     },
     button: {
