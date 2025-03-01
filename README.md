@@ -45,11 +45,11 @@ Run the server
 python3 run.py
 ```
 > [!NOTE]   
->Check out the postman visual studio code [here](https://learning.postman.com/docs/getting-started/basics/about-vs-code-extension/) and learn about how to use postman to run and test backend api endpoints.
+>Check out the postman visual studio code extension [here](https://learning.postman.com/docs/getting-started/basics/about-vs-code-extension/) and learn about how to use postman to run and test backend api endpoints.
 
 Backend documentation can be found at http://localhost:5000/api/v1/docs. The server needs to be running on your local machine to access the api documentation.
 > [!NOTE]   
-> The server runs in debug mode so you can make changes to teh backend without having to rebuild the server. Although, if you make errors in the code that persist, the server might automatically shut down and you will have to rebuild it.
+> The server runs in debug mode so you can make changes to the backend without having to rebuild the server. Although, if you make errors in the code that persist, the server might automatically shut down and you will have to rebuild it.
 
 > [!IMPORTANT]  
 > Ensure to shut down the server when done using it. (Ctrl+C)
