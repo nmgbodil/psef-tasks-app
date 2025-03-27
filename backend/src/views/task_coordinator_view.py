@@ -7,6 +7,9 @@ from src.managers import task_manager, task_coordinator_manager
 from src.constants.http_status_codes import *
 from src.utils import broadcasts
 from src.models.assignment_model import Status
+from src.utils.audit_logger import log_action
+from src.utils.analytics import calculate_task_analytics
+from src.models.versioning import TaskVersion
 
 task_coordinator = Blueprint("task_coordinator", __name__, url_prefix="/api/v1/tasks/coordinator")
 
@@ -41,6 +44,8 @@ def create_task():
 
             # Broadcast updated task list
             broadcasts.broadcast_tasks_update(updated_tasks)
+
+            log_action(user_id, "create_task", data)  # Log action
 
             return jsonify({'message': 'Task successfully created'}), HTTP_201_CREATED
         elif result == 'task exists':
@@ -173,7 +178,16 @@ def update_task(task_id):
         misplaced_fields = [field for field in data if field not in Task.__fields__]
         if misplaced_fields:
             return jsonify({"error": f"Following fields are not valid: {', '.join(misplaced_fields)}"}), HTTP_400_BAD_REQUEST
-        
+
+        # Fetch the current state of the task from the database
+        current_task = task_manager.get_task_by_id(task_id)
+        if not current_task:
+            return jsonify({"error": "Task not found"}), HTTP_404_NOT_FOUND
+
+        # Create a version using the current state of the task
+        TaskVersion.create_version(task_id, current_task)
+
+        # Proceed with updating the task
         result = task_coordinator_manager.update_task(user_id, data, task_id)
 
         if result == 'task successfully updated':
@@ -323,4 +337,14 @@ def delete_user(user_to_delete):
     except ValidationError as e:
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
-        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR    
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task_coordinator.get("/analytics")
+@jwt_required()
+def get_task_analytics():
+    user_id = get_jwt_identity()
+    try:
+        analytics = calculate_task_analytics(user_id)
+        return jsonify({'analytics': analytics}), HTTP_200_OK
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
