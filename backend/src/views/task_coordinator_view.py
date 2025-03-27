@@ -8,7 +8,6 @@ from src.constants.http_status_codes import *
 from src.utils import broadcasts
 from src.models.assignment_model import Status
 from src.utils.audit_logger import log_action
-from src.utils.analytics import calculate_task_analytics
 from src.models.versioning import TaskVersion
 
 task_coordinator = Blueprint("task_coordinator", __name__, url_prefix="/api/v1/tasks/coordinator")
@@ -336,15 +335,5 @@ def delete_user(user_to_delete):
 
     except ValidationError as e:
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
-    except Exception as e:
-        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
-
-@task_coordinator.get("/analytics")
-@jwt_required()
-def get_task_analytics():
-    user_id = get_jwt_identity()
-    try:
-        analytics = calculate_task_analytics(user_id)
-        return jsonify({'analytics': analytics}), HTTP_200_OK
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR

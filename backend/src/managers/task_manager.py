@@ -3,6 +3,8 @@ from datetime import datetime
 from src.models.assignment_model import Status
 from src.dals import user_dal, task_dal, assignment_dal
 from src.utils import format_response
+from src.utils.recommendation import recommend_tasks_for_user
+from src.utils.analytics import calculate_task_analytics
 
 def get_all_tasks(user_id):
     results = {'message': None, 'tasks': None, 'sorted_tasks': None}
@@ -62,4 +64,22 @@ def update_status(user_id, status, assignment_id):
 
     except Exception as e:
         print(f'Error updating task status: {str(e)}')
-        return 'error'   
+        return 'error'
+
+def get_task_recommendations(user_id: str):
+    try:
+        # Call the recommendation utility function
+        recommended_tasks = recommend_tasks_for_user(user_id)
+        return {'message': 'tasks successfully recommended', 'recommended_tasks': recommended_tasks}
+    except Exception as e:
+        print(f"Error fetching task recommendations: {e}")
+        return {'message': 'error'}
+
+def get_task_analytics(user_id: str):
+    try:
+        # Call the analytics utility function
+        analytics = calculate_task_analytics(user_id)
+        return {'message': 'analytics successfully retrieved', 'analytics': analytics}
+    except Exception as e:
+        print(f"Error fetching task analytics: {e}")
+        return {'message': 'error'}

@@ -88,3 +88,43 @@ def update_status(assignment_id):
         return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
     except Exception as e:
         return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task.get("/recommend_tasks")
+@jwt_required()
+def recommend_tasks():
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_manager.get_task_recommendations(user_id)
+        message = result.get('message')
+
+        if message == 'tasks successfully recommended':
+            recommended_tasks = result.get('recommended_tasks')
+            return jsonify({'message': 'Tasks successfully recommended', 'recommended_tasks': recommended_tasks}), HTTP_200_OK
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
+
+@task.get("/analytics")
+@jwt_required()
+def get_task_analytics():
+    user_id = get_jwt_identity()
+
+    try:
+        result = task_manager.get_task_analytics(user_id)
+        message = result.get('message')
+
+        if message == 'analytics successfully retrieved':
+            analytics = result.get('analytics')
+            return jsonify({'message': 'Analytics successfully retrieved', 'analytics': analytics}), HTTP_200_OK
+        else:
+            return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
+
+    except ValidationError as e:
+        return jsonify({'error': e.errors()}), HTTP_422_UNPROCESSABLE_ENTITY
+    except Exception as e:
+        return jsonify({'error': str(e)}), HTTP_500_INTERNAL_SERVER_ERROR
