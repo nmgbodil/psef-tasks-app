@@ -80,3 +80,15 @@ def set_task_updated_at(task_id):
 
     # Should return 0 if the task_id does not exist, else should return 1
     return affected_rows
+
+def get_task_metadata():
+    """
+    Fetch task metadata from the tasks table.
+    Only includes tasks with a start time in the future.
+    """
+    query = """
+    SELECT task_id, task_name, task_type, description
+    FROM tasks
+    WHERE start_time >= CURRENT_TIMESTAMP;
+    """
+    return sync_db_util.execute_query_fetchall(query)

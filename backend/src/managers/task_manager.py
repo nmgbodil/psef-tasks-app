@@ -67,19 +67,31 @@ def update_status(user_id, status, assignment_id):
         return 'error'
 
 def get_task_recommendations(user_id: str):
+    results = {'message': None, 'recommended_tasks': None}
     try:
-        # Call the recommendation utility function
+        if not user_dal.check_user_exists_by_id(user_id):
+            results['message'] = 'DNE'
+            return results
+        # Call the hybrid recommendation system
         recommended_tasks = recommend_tasks_for_user(user_id)
-        return {'message': 'tasks successfully recommended', 'recommended_tasks': recommended_tasks}
+        results['recommended_tasks'] = recommended_tasks
+        results['message'] = 'tasks successfully recommended'
+        return results
     except Exception as e:
         print(f"Error fetching task recommendations: {e}")
-        return {'message': 'error'}
+        return 'error'
 
 def get_task_analytics(user_id: str):
+    results = {'message': None, 'analytics': None}
     try:
+        if not user_dal.check_user_exists_by_id(user_id):
+            results['message'] = 'DNE'
+            return results
         # Call the analytics utility function
         analytics = calculate_task_analytics(user_id)
-        return {'message': 'analytics successfully retrieved', 'analytics': analytics}
+        results['analytics'] = analytics
+        results['message'] = 'analytics successfully retrieved'
+        return results
     except Exception as e:
         print(f"Error fetching task analytics: {e}")
-        return {'message': 'error'}
+        return 'error'

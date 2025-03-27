@@ -101,6 +101,10 @@ def recommend_tasks():
         if message == 'tasks successfully recommended':
             recommended_tasks = result.get('recommended_tasks')
             return jsonify({'message': 'Tasks successfully recommended', 'recommended_tasks': recommended_tasks}), HTTP_200_OK
+        elif message == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
+        elif message == 'error':
+            return jsonify({'error': 'An error occurred while fetching recommendations'}), HTTP_500_INTERNAL_SERVER_ERROR
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
 
@@ -121,6 +125,10 @@ def get_task_analytics():
         if message == 'analytics successfully retrieved':
             analytics = result.get('analytics')
             return jsonify({'message': 'Analytics successfully retrieved', 'analytics': analytics}), HTTP_200_OK
+        elif message == 'DNE':
+            return jsonify({'error': 'Account deleted'}), HTTP_403_FORBIDDEN
+        elif message == 'error':
+            return jsonify({'error': 'An error occurred while fetching analytics'}), HTTP_500_INTERNAL_SERVER_ERROR
         else:
             return jsonify({'error': 'Unknown error'}), HTTP_500_INTERNAL_SERVER_ERROR
 

@@ -103,3 +103,21 @@ def set_assignment_updated_at(assignment_id):
     affected_rows = sync_db_util.execute_query_return_row_count(statement)
 
     return affected_rows
+
+def get_user_task_interactions(user_id=None):
+    """
+    Fetch user-task interaction data from the assignments table.
+    If user_id is provided, fetch interactions for that specific user.
+    """
+    if user_id:
+        query = f"""
+        SELECT user_id, task_id
+        FROM assignments
+        WHERE user_id = '{user_id}';
+        """
+    else:
+        query = """
+        SELECT user_id, task_id
+        FROM assignments;
+        """
+    return sync_db_util.execute_query_fetchall(query)
